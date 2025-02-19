@@ -184,7 +184,7 @@ button.delete:hover {
 } 
 */
 
-#add-tasks-dialog {
+.tasks-dialog {
     position: absolute;
     top: 20%;
     left: 50%;

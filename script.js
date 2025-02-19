@@ -3,15 +3,15 @@ let todos = [
     id: 1,
     display: "Shopping",
     description: "List: Apple, Milk, Spinach.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "19/02/2025, 10:03:12",
+    updated_at: "19/02/2025, 10:03:12",
   },
   {
     id: 2,
     display: "Cycling",
     description: "For 10 minutes between 8 A.M. to 10 A.M.",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "19/02/2025, 10:05:12",
+    updated_at: "19/02/2025, 10:05:12",
   },
 ];
 
@@ -40,7 +40,7 @@ function populateTodoList(todo) {
 
   const viewBtnIcon = document.createElement("i");
   viewBtnIcon.setAttribute("class", "fa-solid fa-eye");
-  viewBtnIcon.setAttribute("id", `${todo.id}-delete`);
+  viewBtnIcon.setAttribute("id", `${todo.id}-view`);
   viewBtn.appendChild(viewBtnIcon);
   todoElement.appendChild(viewBtn);
 
@@ -51,7 +51,7 @@ function populateTodoList(todo) {
 
   const editBtnIcon = document.createElement("i");
   editBtnIcon.setAttribute("class", "fa-solid fa-pen-to-square");
-  editBtnIcon.setAttribute("id", `${todo.id}-delete`);
+  editBtnIcon.setAttribute("id", `${todo.id}-edit`);
   editBtn.appendChild(editBtnIcon);
   todoElement.appendChild(editBtn);
 
@@ -76,23 +76,24 @@ window.addEventListener("load", (event) => {
 });
 
 todoList.addEventListener("click", (event) => {
-  console.log(event);
   const { id } = event.target;
   const data = id.split("-");
   const todoId = data[0];
   const btnName = data[1];
-  console.log(data, todoId, btnName);
 
   if (btnName === "delete") {
     const todoElement = document.querySelector(`#todo-element-${todoId}`);
     todoList.removeChild(todoElement);
   }
+
+  if (btnName === "view") {
+    viewTaskDetails(todoId);
+  }
 });
 
+// Add tasks
 const addTasksDialog = document.querySelector("#add-tasks-dialog");
-const addTasksForm = document.querySelector("#add-tasks-form");
 const addBtn = document.querySelector("#add-tasks-btn");
-// const createBtn = document.querySelector("#create-task-btn");
 const closeBtn = document.querySelector("#cancel-btn");
 addBtn.addEventListener("click", () => {
   addTasksDialog.showModal();
@@ -100,17 +101,15 @@ addBtn.addEventListener("click", () => {
 closeBtn.addEventListener("click", () => {
   addTasksDialog.close();
 });
-// createBtn.addEventListener("click", (event) => {
-//   console.log(event);
-//   // addTasksDialog.close();
-// });
+
+const addTasksForm = document.querySelector("#add-tasks-form");
 addTasksForm.addEventListener("submit", (event) => {
   event.preventDefault(); // Prevents default form submission
 
   const formData = new FormData(addTasksForm);
   const data = Object.fromEntries(formData.entries());
-  data.created_at = new Date();
-  data.updated_at = new Date();
+  data.created_at = new Date().toLocaleString();
+  data.updated_at = new Date().toLocaleString();
 
   const lastTodo = todos.slice(-1);
   const lastTodoID = lastTodo[0].id;
@@ -119,5 +118,27 @@ addTasksForm.addEventListener("submit", (event) => {
 
   populateTodoList(data);
 
+  addTasksForm.reset();
+
   addTasksDialog.close();
 });
+
+// View task details
+function viewTaskDetails(id) {
+  id = parseInt(id, 10);
+  const todo = todos.filter((ele) => {
+    return ele.id === id;
+  })[0];
+
+  const viewTasksDialog = document.querySelector("#view-tasks-dialog");
+  const display = document.querySelector("#view-tasks-dialog #display");
+  const description = document.querySelector("#view-tasks-dialog #description");
+  const created_at = document.querySelector("#view-tasks-dialog #created_at");
+  const updated_at = document.querySelector("#view-tasks-dialog #updated_at");
+  display.value = todo.display;
+  description.value = todo.description;
+  created_at.value = todo.created_at;
+  updated_at.value = todo.updated_at;
+
+  viewTasksDialog.showModal();
+}
