@@ -19,6 +19,9 @@
         </nav>
     </header>
     <main id="dashboard">
+        <section id="add-tasks">
+            <button type="button" id= "add-tasks-btn" class="add"><i class="fa-solid fa-plus"></i> Add Tasks</button>
+        </section>
         <div id="todo-list">
             <!-- <div class="todo-element">
                 <input type="checkbox" name="completed" id="1">
@@ -36,6 +39,52 @@
             </div> -->
         </div>
     </main>
+    <!-- <dialog id="add-tasks-dialog">
+        <form action="" method="dialog">
+            <div class="form-element">
+                <label for="display">Task</label>
+                <input type="text" name="display" id="" placeholder="Enter task..">
+            </div>
+            <div class="form-element">
+                <label for="description">Details</label>
+                <input type="text" name="description" id="" placeholder="Enter additional details..">
+            </div>
+            <div class="form-element">
+                <label for="created_at">Created at</label>
+                <input type="text" name="created_at" id="" readonly>
+            </div>
+            <div class="form-element">
+                <label for="updated_at">Updated at</label>
+                <input type="text" name="updated_at" id="" readonly>
+            </div>
+            <div class="form-element"><button type="submit" id="create-task-btn" class="create">Create</button></div>
+        </form>
+    </dialog> -->
+    <dialog id="add-tasks-dialog">
+        <form action="" method="dialog" id="add-tasks-form">
+            <h2>Add New Task</h2>
+            <div class="form-element">
+                <label for="display">Task</label>
+                <input type="text" name="display" id="display" placeholder="Enter task.." required>
+            </div>
+            <div class="form-element">
+                <label for="description">Details</label>
+                <input type="text" name="description" id="description" placeholder="Enter additional details..">
+            </div>
+            <!-- <div class="form-element">
+                <label for="created_at">Created at</label>
+                <input type="text" name="created_at" id="created_at" readonly>
+            </div>
+            <div class="form-element">
+                <label for="updated_at">Updated at</label>
+                <input type="text" name="updated_at" id="updated_at" readonly>
+            </div> -->
+            <div class="form-actions">
+                <button type="submit" id="create-task-btn" class="create">Create</button>
+                <button type="button" id="cancel-btn" class="cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
     <footer id="footer">
         <p>Copyright &copy todo.newskill.host</p>
     </footer>
