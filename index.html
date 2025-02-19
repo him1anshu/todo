@@ -3,29 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="styles.css">
     <script defer src="script.js"></script>
-    <title>TODO App</title>
+    <title>Tasks</title>
 </head>
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="#">Home</a></li>
+                <li><a href="#">Tasks</a></li>
             </ul>
         </nav>
     </header>
-    <main>
-        <div class="todo-element">
-            <input type="checkbox" name="completed" id="1">
-            <span class="todo-text">Shopping</span>
-            <input type="button" value="view" class="view">
-            <input type="button" value="edit" class="edit">
-            <input type="button" value="delete" class="delete">
+    <main id="dashboard">
+        <div id="todo-list">
+            <!-- <div class="todo-element">
+                <input type="checkbox" name="completed" id="1">
+                <p class="todo-text">Shopping</p>
+                <button type="button" class="view"><i class="fa-solid fa-eye"></i></button>
+                <button type="button" class="edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button type="button" class="delete"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="todo-element">
+                <input type="checkbox" name="completed" id="1">
+                <p class="todo-text">Cycling</p>
+                <button type="button" class="view"><i class="fa-solid fa-eye"></i></button>
+                <button type="button" class="edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button type="button" class="delete"><i class="fa-solid fa-trash"></i></button>
+            </div> -->
         </div>
     </main>
-    <footer>
-        <p>Copyright todo.newskill.host</p>
+    <footer id="footer">
+        <p>Copyright &copy todo.newskill.host</p>
     </footer>
 </body>
 </html>
