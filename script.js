@@ -1,21 +1,9 @@
-let tasks = [
-  {
-    id: 1,
-    display: "Shopping",
-    description: "List: Apple, Milk, Spinach.",
-    created_at: "19/02/2025, 10:03:12",
-    updated_at: "19/02/2025, 10:03:12",
-    status: "pending",
-  },
-  {
-    id: 2,
-    display: "Cycling",
-    description: "For 10 minutes between 8 A.M. to 10 A.M.",
-    created_at: "19/02/2025, 10:05:12",
-    updated_at: "19/02/2025, 10:05:12",
-    status: "completed",
-  },
-];
+let tasks = null;
+if (localStorage.getItem("tasks")) {
+  tasks = JSON.parse(localStorage.getItem("tasks"));
+} else {
+  tasks = [];
+}
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -42,6 +30,10 @@ function renderTask(task) {
   taskText.className = "task-text";
   taskText.id = `task-${task.id}-text`;
   taskText.textContent = task.display;
+
+  if (task.status === "completed") {
+    taskText.style.textDecoration = "line-through";
+  }
   taskItem.appendChild(taskText);
 
   // View Button
@@ -94,15 +86,7 @@ window.addEventListener("load", () => {
 taskListContainer.addEventListener("click", (event) => {
   // Check if the click target is a checkbox
   if (event.target.matches('input[type="checkbox"]')) {
-    const taskId = parseInt(event.target.dataset.taskId, 10);
-    let status = "pending";
-    if (event.target.checked) {
-      status = "completed";
-    }
-    tasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, ...{ status } } : task
-    );
-    toggleTaskCompletion(taskId, event);
+    toggleTaskCompletion(event);
     return;
   }
 
@@ -142,21 +126,30 @@ taskCreateCancel.addEventListener("click", () => {
 
 taskCreateForm.addEventListener("submit", (event) => {
   event.preventDefault();
+
   const formData = new FormData(taskCreateForm);
   const data = Object.fromEntries(formData.entries());
   data.created_at = new Date().toLocaleString();
   data.updated_at = new Date().toLocaleString();
   data.status = "pending";
+
   const lastTask = tasks[tasks.length - 1];
-  data.id = lastTask ? lastTask.id + 1 : 1;
+  data.id = lastTask ? `${parseInt(lastTask.id, 10) + 1}` : "1";
   tasks.push(data);
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
   renderTask(data);
+
   taskCreateForm.reset();
+
   taskCreateDialog.close();
 });
 
 // Delete Task
 function deleteTask(taskId) {
+  tasks = tasks.filter((task) => task.id !== taskId);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
   const taskItem = document.getElementById(`task-item-${taskId}`);
   if (taskItem) {
     taskListContainer.removeChild(taskItem);
@@ -164,47 +157,58 @@ function deleteTask(taskId) {
 }
 
 // View Task Details
-function viewTask(id) {
-  id = parseInt(id, 10);
-  const task = tasks.find((item) => item.id === id);
+function viewTask(taskId) {
+  const task = tasks.find((task) => task.id === taskId);
   if (!task) return;
+
   const taskViewDialog = document.getElementById("task-view-dialog");
+
   document.getElementById("task-view-display").value = task.display;
   document.getElementById("task-view-description").value = task.description;
   document.getElementById("task-view-created").value = task.created_at;
   document.getElementById("task-view-updated").value = task.updated_at;
+
   taskViewDialog.showModal();
 }
 
 // Edit Task Details
-function editTask(id) {
-  id = parseInt(id, 10);
-  const task = tasks.find((item) => item.id === id);
+function editTask(taskId) {
+  const task = tasks.find((task) => task.id === taskId);
   if (!task) return;
+
   const taskEditDialog = document.getElementById("task-edit-dialog");
+
   document.getElementById("task-edit-id").value = task.id;
   document.getElementById("task-edit-display").value = task.display;
   document.getElementById("task-edit-description").value = task.description;
   document.getElementById("task-edit-created").value = task.created_at;
   document.getElementById("task-edit-updated").value = task.updated_at;
+
   taskEditDialog.showModal();
 }
 
 const taskEditForm = document.getElementById("task-edit-form");
 taskEditForm.addEventListener("submit", (event) => {
   event.preventDefault();
+
   const formData = new FormData(taskEditForm);
   const data = Object.fromEntries(formData.entries());
   data.updated_at = new Date().toLocaleString();
-  const taskId = parseInt(data.id, 10);
+
+  const taskId = data.id;
   tasks = tasks.map((task) =>
     task.id === taskId ? { ...task, ...data } : task
   );
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
   const taskText = document.getElementById(`task-${taskId}-text`);
   if (taskText) {
     taskText.textContent = data.display;
   }
+
   taskEditForm.reset();
+
   document.getElementById("task-edit-dialog").close();
 });
 
@@ -213,18 +217,29 @@ taskEditCancel.addEventListener("click", () => {
   document.getElementById("task-edit-dialog").close();
 });
 
-function toggleTaskCompletion(id, event) {
-  const taskText = document.getElementById(`task-${id}-text`);
-  const editBtn = document.querySelector(`button.edit[data-task-id="${id}"]`);
+function toggleTaskCompletion(event) {
+  const taskId = event.target.dataset.taskId;
+  const taskText = document.getElementById(`task-${taskId}-text`);
+  const editBtn = document.querySelector(
+    `button.edit[data-task-id="${taskId}"]`
+  );
+
+  let status = "pending";
   if (event.target.checked) {
     taskText.style.textDecoration = "line-through";
     editBtn.setAttribute("disabled", "disabled");
-    // editBtn.style.display = "none";
+    status = "completed";
   } else {
     taskText.style.textDecoration = "none";
     editBtn.removeAttribute("disabled");
     editBtn.style.display = "block";
   }
+
+  tasks = tasks.map((task) =>
+    task.id === taskId ? { ...task, ...{ status } } : task
+  );
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 // Applying filter using dropdown
@@ -238,4 +253,35 @@ taskFilter.addEventListener("click", (event) => {
       renderTask(task);
     }
   }
+});
+
+// Search tasks
+const searchInput = document.querySelector("#task-search input");
+const searchBtn = document.getElementById("task-search-btn");
+searchBtn.addEventListener("click", () => {
+  const searchText = new RegExp(searchInput.value, "i");
+  const task = tasks.find((task) => {
+    return task.display.match(searchText);
+  });
+  const filteredTasks = task ? [task] : [];
+
+  taskListContainer.innerHTML = "";
+
+  for (const task of filteredTasks) {
+    renderTask(task);
+  }
+
+  searchInput.value = "";
+});
+
+// Clear filtered tasks
+const clearSearchBtn = document.getElementById("clear-search-btn");
+clearSearchBtn.addEventListener("click", () => {
+  taskListContainer.innerHTML = "";
+
+  for (const task of tasks) {
+    renderTask(task);
+  }
+
+  searchInput.value = "";
 });
