@@ -1,4 +1,4 @@
-let todos = [
+let tasks = [
   {
     id: 1,
     display: "Shopping",
@@ -15,205 +15,196 @@ let todos = [
   },
 ];
 
-const todoList = document.querySelector("#todo-list");
+const taskListContainer = document.getElementById("task-list");
 
-function populateTodoList(todo) {
-  const todoElement = document.createElement("div");
-  todoElement.setAttribute("class", "todo-element");
-  todoElement.setAttribute("id", `todo-element-${todo.id}`);
+function renderTask(task) {
+  const taskItem = document.createElement("div");
+  taskItem.className = "task-item";
+  taskItem.id = `task-item-${task.id}`;
 
+  // Checkbox
   const checkbox = document.createElement("input");
-  checkbox.setAttribute("type", "checkbox");
-  checkbox.setAttribute("id", `${todo.id}-checkbox`);
-  checkbox.setAttribute("name", "completed");
-  todoElement.appendChild(checkbox);
+  checkbox.type = "checkbox";
+  checkbox.id = `task-${task.id}-checkbox`;
+  checkbox.name = "completed";
+  checkbox.dataset.action = "checkbox";
+  checkbox.dataset.taskId = task.id;
+  taskItem.appendChild(checkbox);
 
-  const todoText = document.createElement("p");
-  todoText.setAttribute("class", "todo-text");
-  todoText.setAttribute("id", `${todo.id}-text`);
-  todoText.textContent = todo.display;
-  todoElement.appendChild(todoText);
+  // Task text
+  const taskText = document.createElement("p");
+  taskText.className = "task-text";
+  taskText.id = `task-${task.id}-text`;
+  taskText.textContent = task.display;
+  taskItem.appendChild(taskText);
 
+  // View Button
   const viewBtn = document.createElement("button");
-  viewBtn.setAttribute("type", "button");
-  viewBtn.setAttribute("class", "view");
-  viewBtn.setAttribute("id", `${todo.id}-view`);
+  viewBtn.type = "button";
+  viewBtn.className = "view";
+  viewBtn.dataset.action = "view";
+  viewBtn.dataset.taskId = task.id;
+  viewBtn.setAttribute("aria-label", "View Task");
+  const viewIcon = document.createElement("i");
+  viewIcon.className = "fa-solid fa-eye";
+  viewBtn.appendChild(viewIcon);
+  taskItem.appendChild(viewBtn);
 
-  const viewBtnIcon = document.createElement("i");
-  viewBtnIcon.setAttribute("class", "fa-solid fa-eye");
-  viewBtnIcon.setAttribute("id", `${todo.id}-view`);
-  viewBtn.appendChild(viewBtnIcon);
-  todoElement.appendChild(viewBtn);
-
+  // Edit Button
   const editBtn = document.createElement("button");
-  editBtn.setAttribute("type", "button");
-  editBtn.setAttribute("class", "edit");
-  editBtn.setAttribute("id", `${todo.id}-edit`);
+  editBtn.type = "button";
+  editBtn.className = "edit";
+  editBtn.dataset.action = "edit";
+  editBtn.dataset.taskId = task.id;
+  editBtn.setAttribute("aria-label", "Edit Task");
+  const editIcon = document.createElement("i");
+  editIcon.className = "fa-solid fa-pen-to-square";
+  editBtn.appendChild(editIcon);
+  taskItem.appendChild(editBtn);
 
-  const editBtnIcon = document.createElement("i");
-  editBtnIcon.setAttribute("class", "fa-solid fa-pen-to-square");
-  editBtnIcon.setAttribute("id", `${todo.id}-edit`);
-  editBtn.appendChild(editBtnIcon);
-  todoElement.appendChild(editBtn);
-
+  // Delete Button
   const deleteBtn = document.createElement("button");
-  deleteBtn.setAttribute("type", "button");
-  deleteBtn.setAttribute("class", "delete");
-  deleteBtn.setAttribute("id", `${todo.id}-delete`);
+  deleteBtn.type = "button";
+  deleteBtn.className = "delete";
+  deleteBtn.dataset.action = "delete";
+  deleteBtn.dataset.taskId = task.id;
+  deleteBtn.setAttribute("aria-label", "Delete Task");
+  const deleteIcon = document.createElement("i");
+  deleteIcon.className = "fa-solid fa-trash";
+  deleteBtn.appendChild(deleteIcon);
+  taskItem.appendChild(deleteBtn);
 
-  const deleteBtnIcon = document.createElement("i");
-  deleteBtnIcon.setAttribute("class", "fa-solid fa-trash");
-  deleteBtnIcon.setAttribute("id", `${todo.id}-delete`);
-  deleteBtn.appendChild(deleteBtnIcon);
-  todoElement.appendChild(deleteBtn);
-
-  todoList.appendChild(todoElement);
+  taskListContainer.appendChild(taskItem);
 }
 
-window.addEventListener("load", (event) => {
-  for (const todo of todos) {
-    populateTodoList(todo);
+window.addEventListener("load", () => {
+  tasks.forEach((task) => renderTask(task));
+});
+
+taskListContainer.addEventListener("click", (event) => {
+  // Check if the click target is a checkbox
+  if (event.target.matches('input[type="checkbox"]')) {
+    const taskId = event.target.dataset.taskId;
+    toggleTaskCompletion(taskId, event);
+    return;
+  }
+
+  // Otherwise, check for button clicks
+  const targetButton = event.target.closest("button");
+  if (!targetButton) return;
+  const action = targetButton.dataset.action;
+  const taskId = targetButton.dataset.taskId;
+
+  switch (action) {
+    case "delete": {
+      deleteTask(taskId);
+      break;
+    }
+    case "view":
+      viewTask(taskId);
+      break;
+    case "edit":
+      editTask(taskId);
+      break;
+    // Note: "checkbox" case is now handled above
   }
 });
 
-todoList.addEventListener("click", (event) => {
-  const { id } = event.target;
-  const data = id.split("-");
-  const todoId = data[0];
-  const btnName = data[1];
+// Create Task Dialog and Form
+const taskCreateDialog = document.getElementById("task-create-dialog");
+const taskAddBtn = document.getElementById("task-add-btn");
+const taskCreateCancel = document.getElementById("task-create-cancel");
+const taskCreateForm = document.getElementById("task-create-form");
 
-  if (btnName === "delete") {
-    const todoElement = document.querySelector(`#todo-element-${todoId}`);
-    todoList.removeChild(todoElement);
-  }
-
-  if (btnName === "view") {
-    viewTaskDetails(todoId);
-  }
-
-  if (btnName === "edit") {
-    editTaskDetails(todoId);
-  }
-
-  if (btnName === "checkbox") {
-    markTaskCompleted(todoId, event);
-  }
+taskAddBtn.addEventListener("click", () => {
+  taskCreateDialog.showModal();
 });
 
-// Create tasks
-const createTasksDialog = document.querySelector("#create-tasks-dialog");
-const createBtn = document.querySelector("#create-tasks-btn");
-const closeBtn = document.querySelector("#create-cancel-btn");
-createBtn.addEventListener("click", () => {
-  createTasksDialog.showModal();
-});
-closeBtn.addEventListener("click", () => {
-  createTasksDialog.close();
+taskCreateCancel.addEventListener("click", () => {
+  taskCreateDialog.close();
 });
 
-const createTasksForm = document.querySelector("#create-tasks-form");
-createTasksForm.addEventListener("submit", (event) => {
-  event.preventDefault(); // Prevents default form submission
-
-  const formData = new FormData(addTasksForm);
+taskCreateForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const formData = new FormData(taskCreateForm);
   const data = Object.fromEntries(formData.entries());
   data.created_at = new Date().toLocaleString();
   data.updated_at = new Date().toLocaleString();
-
-  const lastTodo = todos.slice(-1);
-  const lastTodoID = lastTodo[0].id;
-  data.id = lastTodoID + 1;
-  todos.push(data);
-
-  populateTodoList(data);
-
-  createTasksForm.reset();
-
-  createTasksDialog.close();
+  const lastTask = tasks[tasks.length - 1];
+  data.id = lastTask ? lastTask.id + 1 : 1;
+  tasks.push(data);
+  renderTask(data);
+  taskCreateForm.reset();
+  taskCreateDialog.close();
 });
 
-// View task details
-function viewTaskDetails(id) {
-  id = parseInt(id, 10);
-  const todo = todos.filter((ele) => {
-    return ele.id === id;
-  })[0];
-
-  const viewTasksDialog = document.querySelector("#view-tasks-dialog");
-  const display = document.querySelector("#view-tasks-dialog #display");
-  const description = document.querySelector("#view-tasks-dialog #description");
-  const created_at = document.querySelector("#view-tasks-dialog #created_at");
-  const updated_at = document.querySelector("#view-tasks-dialog #updated_at");
-  display.value = todo.display;
-  description.value = todo.description;
-  created_at.value = todo.created_at;
-  updated_at.value = todo.updated_at;
-
-  viewTasksDialog.showModal();
+// Delete Task
+function deleteTask(taskId) {
+  const taskItem = document.getElementById(`task-item-${taskId}`);
+  if (taskItem) {
+    taskListContainer.removeChild(taskItem);
+  }
 }
 
-// Update task details
-function editTaskDetails(id) {
+// View Task Details
+function viewTask(id) {
   id = parseInt(id, 10);
-  const todo = todos.filter((ele) => {
-    return ele.id === id;
-  })[0];
-
-  const editTasksDialog = document.querySelector("#edit-tasks-dialog");
-  const display = document.querySelector("#edit-tasks-dialog #display");
-  const description = document.querySelector("#edit-tasks-dialog #description");
-  const created_at = document.querySelector("#edit-tasks-dialog #created_at");
-  const updated_at = document.querySelector("#edit-tasks-dialog #updated_at");
-  const taskId = document.querySelector("#edit-tasks-dialog #task-id");
-
-  taskId.value = todo.id;
-  display.value = todo.display;
-  description.value = todo.description;
-  created_at.value = todo.created_at;
-  updated_at.value = todo.updated_at;
-
-  editTasksDialog.showModal();
+  const task = tasks.find((item) => item.id === id);
+  if (!task) return;
+  const taskViewDialog = document.getElementById("task-view-dialog");
+  document.getElementById("task-view-display").value = task.display;
+  document.getElementById("task-view-description").value = task.description;
+  document.getElementById("task-view-created").value = task.created_at;
+  document.getElementById("task-view-updated").value = task.updated_at;
+  taskViewDialog.showModal();
 }
 
-const editTasksForm = document.querySelector("#edit-tasks-form");
-editTasksForm.addEventListener("submit", (event) => {
-  event.preventDefault(); // Prevents default form submission
+// Edit Task Details
+function editTask(id) {
+  id = parseInt(id, 10);
+  const task = tasks.find((item) => item.id === id);
+  if (!task) return;
+  const taskEditDialog = document.getElementById("task-edit-dialog");
+  document.getElementById("task-edit-id").value = task.id;
+  document.getElementById("task-edit-display").value = task.display;
+  document.getElementById("task-edit-description").value = task.description;
+  document.getElementById("task-edit-created").value = task.created_at;
+  document.getElementById("task-edit-updated").value = task.updated_at;
+  taskEditDialog.showModal();
+}
 
-  const formData = new FormData(editTasksForm);
+const taskEditForm = document.getElementById("task-edit-form");
+taskEditForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const formData = new FormData(taskEditForm);
   const data = Object.fromEntries(formData.entries());
   data.updated_at = new Date().toLocaleString();
-
-  const todoID = parseInt(data.id, 10);
-  todos.forEach((todo) => {
-    if (todo.id === todoID) {
-      Object.assign(todo, data);
-    }
-  });
-
-  const todoText = document.getElementById(`${todoID}-text`);
-  todoText.textContent = data.display;
-  editTasksForm.reset();
-
-  const editTasksDialog = document.getElementById("edit-tasks-dialog");
-  editTasksDialog.close();
+  const taskId = parseInt(data.id, 10);
+  tasks = tasks.map((task) =>
+    task.id === taskId ? { ...task, ...data } : task
+  );
+  const taskText = document.getElementById(`task-${taskId}-text`);
+  if (taskText) {
+    taskText.textContent = data.display;
+  }
+  taskEditForm.reset();
+  document.getElementById("task-edit-dialog").close();
 });
 
-const editTasksDialog = document.getElementById("edit-tasks-dialog");
-const editCloseBtn = document.getElementById("edit-cancel-btn");
-editCloseBtn.addEventListener("click", () => {
-  editTasksDialog.close();
+const taskEditCancel = document.getElementById("task-edit-cancel");
+taskEditCancel.addEventListener("click", () => {
+  document.getElementById("task-edit-dialog").close();
 });
 
-function markTaskCompleted(id, event) {
-  const todoText = document.getElementById(`${id}-text`);
-  const editBtn = document.getElementById(`${id}-edit`);
-
+function toggleTaskCompletion(id, event) {
+  const taskText = document.getElementById(`task-${id}-text`);
+  const editBtn = document.querySelector(`button.edit[data-task-id="${id}"]`);
   if (event.target.checked) {
-    todoText.style.textDecoration = "line-through";
+    taskText.style.textDecoration = "line-through";
     editBtn.setAttribute("disabled", "disabled");
     editBtn.style.display = "none";
   } else {
-    todoText.style.textDecoration = "none";
+    taskText.style.textDecoration = "none";
     editBtn.removeAttribute("disabled");
     editBtn.style.display = "block";
   }

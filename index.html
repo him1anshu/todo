@@ -1,124 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
     <script defer src="script.js"></script>
     <title>Tasks</title>
 </head>
+
 <body>
     <header>
-        <nav>
+        <nav aria-label="Main Navigation">
             <ul>
-                <li><a href="#">Tasks</a></li>
+                <li><a href="#" class="active">Tasks</a></li>
             </ul>
         </nav>
     </header>
-    <main id="dashboard">
-        <section id="create-tasks">
-            <button type="button" id="create-tasks-btn" class="add"><i class="fa-solid fa-plus"></i> Add Tasks</button>
+    <main id="task-dashboard">
+        <section id="task-create-section">
+            <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
+                <i class="fa-solid fa-plus"></i> Add Task
+            </button>
         </section>
-        <div id="todo-list">
-            <!-- <div class="todo-element">
-                <input type="checkbox" name="completed" id="1">
-                <p class="todo-text">Shopping</p>
-                <button type="button" class="view"><i class="fa-solid fa-eye"></i></button>
-                <button type="button" class="edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button type="button" class="delete"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            <div class="todo-element">
-                <input type="checkbox" name="completed" id="1">
-                <p class="todo-text">Cycling</p>
-                <button type="button" class="view"><i class="fa-solid fa-eye"></i></button>
-                <button type="button" class="edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button type="button" class="delete"><i class="fa-solid fa-trash"></i></button>
-            </div> -->
+        <div id="task-list">
+            <!-- Task items will be inserted here dynamically -->
         </div>
     </main>
-    <dialog id="create-tasks-dialog" class="tasks-dialog">
-        <form action="" method="dialog" id="create-tasks-form">
+
+    <dialog id="task-create-dialog" class="task-dialog">
+        <form method="dialog" id="task-create-form">
             <h2>Create New Task</h2>
             <div class="form-element">
-                <label for="display">Task</label>
-                <input type="text" name="display" id="display" placeholder="Enter task.." required>
+                <label for="task-create-display">Task</label>
+                <input type="text" name="display" id="task-create-display" placeholder="Enter task..." required />
             </div>
             <div class="form-element">
-                <label for="description">Details</label>
-                <input type="text" name="description" id="description" placeholder="Enter additional details..">
+                <label for="task-create-description">Details</label>
+                <input type="text" name="description" id="task-create-description"
+                    placeholder="Enter additional details..." />
             </div>
-            <!-- <div class="form-element">
-                <label for="created_at">Created at</label>
-                <input type="text" name="created_at" id="created_at" readonly>
-            </div>
-            <div class="form-element">
-                <label for="updated_at">Updated at</label>
-                <input type="text" name="updated_at" id="updated_at" readonly>
-            </div> -->
             <div class="form-actions">
-                <button type="submit" id="create-task-btn" class="create">Create</button>
-                <button type="button" id="create-cancel-btn" class="cancel">Cancel</button>
+                <button type="submit" id="task-create-submit" class="btn-create">Create</button>
+                <button type="button" id="task-create-cancel" class="btn-cancel">Cancel</button>
             </div>
         </form>
     </dialog>
-    <dialog id="view-tasks-dialog" class="tasks-dialog">
-        <form action="" method="dialog" id="view-tasks-form">
+
+    <dialog id="task-view-dialog" class="task-dialog">
+        <form method="dialog" id="task-view-form">
             <h2>Task Details</h2>
             <div class="form-element">
-                <label for="display">Task</label>
-                <input type="text" name="display" id="display" required readonly>
+                <label for="task-view-display">Task</label>
+                <input type="text" name="display" id="task-view-display" required readonly />
             </div>
             <div class="form-element">
-                <label for="description">Details</label>
-                <input type="text" name="description" id="description" readonly>
+                <label for="task-view-description">Details</label>
+                <input type="text" name="description" id="task-view-description" readonly />
             </div>
             <div class="form-element">
-                    <label for="created_at">Created at</label>
-                    <input type="text" name="created_at" id="created_at" readonly>
-                </div>
+                <label for="task-view-created">Created at</label>
+                <input type="text" name="created_at" id="task-view-created" readonly />
+            </div>
             <div class="form-element">
-                    <label for="updated_at">Updated at</label>
-                    <input type="text" name="updated_at" id="updated_at" readonly>
-                </div>
+                <label for="task-view-updated">Updated at</label>
+                <input type="text" name="updated_at" id="task-view-updated" readonly />
+            </div>
             <div class="form-actions">
-                <button type="submit" id="create-btn" class="create">Close</button>
+                <button type="submit" id="task-view-close" class="btn-create">Close</button>
             </div>
         </form>
     </dialog>
-    <dialog id="edit-tasks-dialog" class="tasks-dialog">
-        <form action="" method="dialog" id="edit-tasks-form">
+
+    <dialog id="task-edit-dialog" class="task-dialog">
+        <form method="dialog" id="task-edit-form">
             <h2>Update Task Details</h2>
             <div class="form-element">
-                <label for="display">Task</label>
-                <input type="text" name="id" id="task-id" readonly>
+                <label for="task-edit-id">Task ID</label>
+                <input type="text" name="id" id="task-edit-id" readonly />
             </div>
             <div class="form-element">
-                <label for="display">Task</label>
-                <input type="text" name="display" id="display" required>
+                <label for="task-edit-display">Task</label>
+                <input type="text" name="display" id="task-edit-display" required />
             </div>
             <div class="form-element">
-                <label for="description">Details</label>
-                <input type="text" name="description" id="description">
+                <label for="task-edit-description">Details</label>
+                <input type="text" name="description" id="task-edit-description" />
             </div>
             <div class="form-element">
-                <label for="created_at">Created at</label>
-                <input type="text" name="created_at" id="created_at" readonly>
+                <label for="task-edit-created">Created at</label>
+                <input type="text" name="created_at" id="task-edit-created" readonly />
             </div>
             <div class="form-element">
-                <label for="updated_at">Updated at</label>
-                <input type="text" name="updated_at" id="updated_at" readonly>
+                <label for="task-edit-updated">Updated at</label>
+                <input type="text" name="updated_at" id="task-edit-updated" readonly />
             </div>
             <div class="form-actions">
-                <button type="submit" id="edit-task-btn" class="create">Update</button>
-                <button type="button" id="edit-cancel-btn" class="cancel">Cancel</button>
+                <button type="submit" id="task-edit-submit" class="btn-create">Update</button>
+                <button type="button" id="task-edit-cancel" class="btn-cancel">Cancel</button>
             </div>
         </form>
     </dialog>
-    <footer id="footer">
-        <p>Copyright &copy todo.newskill.host</p>
+
+    <footer id="site-footer">
+        <p>&copy; todo.newskill.host</p>
     </footer>
 </body>
+
 </html>
