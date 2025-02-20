@@ -30,6 +30,7 @@ function populateTodoList(todo) {
 
   const todoText = document.createElement("p");
   todoText.setAttribute("class", "todo-text");
+  todoText.setAttribute("id", `${todo.id}-text`);
   todoText.textContent = todo.display;
   todoElement.appendChild(todoText);
 
@@ -89,21 +90,29 @@ todoList.addEventListener("click", (event) => {
   if (btnName === "view") {
     viewTaskDetails(todoId);
   }
+
+  if (btnName === "edit") {
+    editTaskDetails(todoId);
+  }
+
+  if (btnName === "checkbox") {
+    markTaskCompleted(todoId, event);
+  }
 });
 
-// Add tasks
-const addTasksDialog = document.querySelector("#add-tasks-dialog");
-const addBtn = document.querySelector("#add-tasks-btn");
-const closeBtn = document.querySelector("#cancel-btn");
-addBtn.addEventListener("click", () => {
-  addTasksDialog.showModal();
+// Create tasks
+const createTasksDialog = document.querySelector("#create-tasks-dialog");
+const createBtn = document.querySelector("#create-tasks-btn");
+const closeBtn = document.querySelector("#create-cancel-btn");
+createBtn.addEventListener("click", () => {
+  createTasksDialog.showModal();
 });
 closeBtn.addEventListener("click", () => {
-  addTasksDialog.close();
+  createTasksDialog.close();
 });
 
-const addTasksForm = document.querySelector("#add-tasks-form");
-addTasksForm.addEventListener("submit", (event) => {
+const createTasksForm = document.querySelector("#create-tasks-form");
+createTasksForm.addEventListener("submit", (event) => {
   event.preventDefault(); // Prevents default form submission
 
   const formData = new FormData(addTasksForm);
@@ -118,9 +127,9 @@ addTasksForm.addEventListener("submit", (event) => {
 
   populateTodoList(data);
 
-  addTasksForm.reset();
+  createTasksForm.reset();
 
-  addTasksDialog.close();
+  createTasksDialog.close();
 });
 
 // View task details
@@ -141,4 +150,71 @@ function viewTaskDetails(id) {
   updated_at.value = todo.updated_at;
 
   viewTasksDialog.showModal();
+}
+
+// Update task details
+function editTaskDetails(id) {
+  id = parseInt(id, 10);
+  const todo = todos.filter((ele) => {
+    return ele.id === id;
+  })[0];
+
+  const editTasksDialog = document.querySelector("#edit-tasks-dialog");
+  const display = document.querySelector("#edit-tasks-dialog #display");
+  const description = document.querySelector("#edit-tasks-dialog #description");
+  const created_at = document.querySelector("#edit-tasks-dialog #created_at");
+  const updated_at = document.querySelector("#edit-tasks-dialog #updated_at");
+  const taskId = document.querySelector("#edit-tasks-dialog #task-id");
+
+  taskId.value = todo.id;
+  display.value = todo.display;
+  description.value = todo.description;
+  created_at.value = todo.created_at;
+  updated_at.value = todo.updated_at;
+
+  editTasksDialog.showModal();
+}
+
+const editTasksForm = document.querySelector("#edit-tasks-form");
+editTasksForm.addEventListener("submit", (event) => {
+  event.preventDefault(); // Prevents default form submission
+
+  const formData = new FormData(editTasksForm);
+  const data = Object.fromEntries(formData.entries());
+  data.updated_at = new Date().toLocaleString();
+
+  const todoID = parseInt(data.id, 10);
+  todos.forEach((todo) => {
+    if (todo.id === todoID) {
+      Object.assign(todo, data);
+    }
+  });
+
+  const todoText = document.getElementById(`${todoID}-text`);
+  todoText.textContent = data.display;
+  editTasksForm.reset();
+
+  const editTasksDialog = document.getElementById("edit-tasks-dialog");
+  editTasksDialog.close();
+});
+
+const editTasksDialog = document.getElementById("edit-tasks-dialog");
+const editCloseBtn = document.getElementById("edit-cancel-btn");
+editCloseBtn.addEventListener("click", () => {
+  editTasksDialog.close();
+});
+
+function markTaskCompleted(id, event) {
+  const todoText = document.getElementById(`${id}-text`);
+  const editBtn = document.getElementById(`${id}-edit`);
+
+  if (event.target.checked) {
+    todoText.style.textDecoration = "line-through";
+    editBtn.setAttribute("disabled", "disabled");
+    editBtn.style.display = "none";
+  } else {
+    todoText.style.textDecoration = "none";
+    editBtn.removeAttribute("disabled");
+    editBtn.style.display = "block";
+  }
 }

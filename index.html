@@ -19,8 +19,8 @@
         </nav>
     </header>
     <main id="dashboard">
-        <section id="add-tasks">
-            <button type="button" id= "add-tasks-btn" class="add"><i class="fa-solid fa-plus"></i> Add Tasks</button>
+        <section id="create-tasks">
+            <button type="button" id="create-tasks-btn" class="add"><i class="fa-solid fa-plus"></i> Add Tasks</button>
         </section>
         <div id="todo-list">
             <!-- <div class="todo-element">
@@ -39,9 +39,9 @@
             </div> -->
         </div>
     </main>
-    <dialog id="add-tasks-dialog" class="tasks-dialog">
-        <form action="" method="dialog" id="add-tasks-form">
-            <h2>Add New Task</h2>
+    <dialog id="create-tasks-dialog" class="tasks-dialog">
+        <form action="" method="dialog" id="create-tasks-form">
+            <h2>Create New Task</h2>
             <div class="form-element">
                 <label for="display">Task</label>
                 <input type="text" name="display" id="display" placeholder="Enter task.." required>
@@ -60,7 +60,7 @@
             </div> -->
             <div class="form-actions">
                 <button type="submit" id="create-task-btn" class="create">Create</button>
-                <button type="button" id="cancel-btn" class="cancel">Cancel</button>
+                <button type="button" id="create-cancel-btn" class="cancel">Cancel</button>
             </div>
         </form>
     </dialog>
@@ -79,12 +79,41 @@
                     <label for="created_at">Created at</label>
                     <input type="text" name="created_at" id="created_at" readonly>
                 </div>
-                <div class="form-element">
+            <div class="form-element">
                     <label for="updated_at">Updated at</label>
                     <input type="text" name="updated_at" id="updated_at" readonly>
                 </div>
             <div class="form-actions">
                 <button type="submit" id="create-btn" class="create">Close</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="edit-tasks-dialog" class="tasks-dialog">
+        <form action="" method="dialog" id="edit-tasks-form">
+            <h2>Update Task Details</h2>
+            <div class="form-element">
+                <label for="display">Task</label>
+                <input type="text" name="id" id="task-id" readonly>
+            </div>
+            <div class="form-element">
+                <label for="display">Task</label>
+                <input type="text" name="display" id="display" required>
+            </div>
+            <div class="form-element">
+                <label for="description">Details</label>
+                <input type="text" name="description" id="description">
+            </div>
+            <div class="form-element">
+                <label for="created_at">Created at</label>
+                <input type="text" name="created_at" id="created_at" readonly>
+            </div>
+            <div class="form-element">
+                <label for="updated_at">Updated at</label>
+                <input type="text" name="updated_at" id="updated_at" readonly>
+            </div>
+            <div class="form-actions">
+                <button type="submit" id="edit-task-btn" class="create">Update</button>
+                <button type="button" id="edit-cancel-btn" class="cancel">Cancel</button>
             </div>
         </form>
     </dialog>

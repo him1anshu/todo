@@ -62,7 +62,7 @@ nav a:hover:not(.active) {
     padding: 2rem;
 }
 
-#add-tasks {
+#create-tasks {
     margin-bottom: 1rem;
     /* align-self: flex-end; */
 }
@@ -148,41 +148,6 @@ button.edit:hover,
 button.delete:hover {
     transform: scale(1.1);
 }
-
-/* 
-#add-tasks-dialog {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    width: 40%;
-    height: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-    border: none;
-    -webkit-box-shadow: -1px -1px 39px 13px rgba(0, 0, 0, 0.32);
-    -moz-box-shadow: -1px -1px 39px 13px rgba(0, 0, 0, 0.32);
-    box-shadow: -1px -1px 39px 13px rgba(0, 0, 0, 0.32);
-}
-
-.form-element > label {
-    display: inline-block;
-    width: 100px;
-}
-
-.form-element>input {
-    display: inline-block;
-    width: 200px;
-    outline: none;
-    border: none;
-    background-color: #ddd;
-    border-radius: .2rem;
-    height: 2rem;
-    margin-bottom: .2rem;
-} 
-*/
 
 .tasks-dialog {
     position: absolute;
