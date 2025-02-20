@@ -202,7 +202,7 @@ function toggleTaskCompletion(id, event) {
   if (event.target.checked) {
     taskText.style.textDecoration = "line-through";
     editBtn.setAttribute("disabled", "disabled");
-    editBtn.style.display = "none";
+    // editBtn.style.display = "none";
   } else {
     taskText.style.textDecoration = "none";
     editBtn.removeAttribute("disabled");
