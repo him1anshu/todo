@@ -24,6 +24,11 @@
     </header>
     <main id="task-dashboard">
         <section id="task-create-section">
+            <select name="task-status" id="task-filter">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
             <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
                 <i class="fa-solid fa-plus"></i> Add Task
             </button>

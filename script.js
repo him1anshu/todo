@@ -5,6 +5,7 @@ let tasks = [
     description: "List: Apple, Milk, Spinach.",
     created_at: "19/02/2025, 10:03:12",
     updated_at: "19/02/2025, 10:03:12",
+    status: "pending",
   },
   {
     id: 2,
@@ -12,6 +13,7 @@ let tasks = [
     description: "For 10 minutes between 8 A.M. to 10 A.M.",
     created_at: "19/02/2025, 10:05:12",
     updated_at: "19/02/2025, 10:05:12",
+    status: "completed",
   },
 ];
 
@@ -29,6 +31,10 @@ function renderTask(task) {
   checkbox.name = "completed";
   checkbox.dataset.action = "checkbox";
   checkbox.dataset.taskId = task.id;
+
+  if (task.status === "completed") {
+    checkbox.checked = "checked";
+  }
   taskItem.appendChild(checkbox);
 
   // Task text
@@ -59,6 +65,10 @@ function renderTask(task) {
   editBtn.setAttribute("aria-label", "Edit Task");
   const editIcon = document.createElement("i");
   editIcon.className = "fa-solid fa-pen-to-square";
+
+  if (task.status === "completed") {
+    editBtn.disabled = "disabled";
+  }
   editBtn.appendChild(editIcon);
   taskItem.appendChild(editBtn);
 
@@ -84,7 +94,14 @@ window.addEventListener("load", () => {
 taskListContainer.addEventListener("click", (event) => {
   // Check if the click target is a checkbox
   if (event.target.matches('input[type="checkbox"]')) {
-    const taskId = event.target.dataset.taskId;
+    const taskId = parseInt(event.target.dataset.taskId, 10);
+    let status = "pending";
+    if (event.target.checked) {
+      status = "completed";
+    }
+    tasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, ...{ status } } : task
+    );
     toggleTaskCompletion(taskId, event);
     return;
   }
@@ -96,10 +113,9 @@ taskListContainer.addEventListener("click", (event) => {
   const taskId = targetButton.dataset.taskId;
 
   switch (action) {
-    case "delete": {
+    case "delete":
       deleteTask(taskId);
       break;
-    }
     case "view":
       viewTask(taskId);
       break;
@@ -130,6 +146,7 @@ taskCreateForm.addEventListener("submit", (event) => {
   const data = Object.fromEntries(formData.entries());
   data.created_at = new Date().toLocaleString();
   data.updated_at = new Date().toLocaleString();
+  data.status = "pending";
   const lastTask = tasks[tasks.length - 1];
   data.id = lastTask ? lastTask.id + 1 : 1;
   tasks.push(data);
@@ -209,3 +226,16 @@ function toggleTaskCompletion(id, event) {
     editBtn.style.display = "block";
   }
 }
+
+// Applying filter using dropdown
+const taskFilter = document.getElementById("task-filter");
+taskFilter.addEventListener("click", (event) => {
+  const status = event.target.value;
+  taskListContainer.innerHTML = "";
+
+  for (const task of tasks) {
+    if (!status || task.status === status) {
+      renderTask(task);
+    }
+  }
+});
