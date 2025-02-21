@@ -365,3 +365,27 @@ button[disabled] {
     background-color: #b0b0b0;
     color: #ffffff;
 }
+
+@media (max-width: 680px) {
+    #task-create-section {
+        flex-direction: column;
+    }
+
+    #task-filter, #task-add-btn {
+        margin-top: 5px;
+        width: 100%;
+    }
+
+    #task-search {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 400px) {
+    #task-search button, #task-search input {
+        margin-top: 5px;
+        width: 100%;
+    }
+
+}

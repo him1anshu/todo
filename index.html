@@ -24,13 +24,8 @@
     </header>
     <main id="task-dashboard">
         <section id="task-create-section">
-            <select name="task-status" id="task-filter">
-                <option value="">All</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-            </select>
             <section id="task-search">
-                <input type="text" placeholder="Search task.."/>
+                <input type="text" placeholder="Search task.." />
                 <button type="button" id="task-search-btn" class="btn-search" aria-label="Search Task">
                     <i class="fa-solid fa-search"></i>
                 </button>
@@ -38,6 +33,12 @@
                     <i class="fa-solid fa-multiply"></i>
                 </button>
             </section>
+            <select name="task-status" id="task-filter">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+    
             <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
                 <i class="fa-solid fa-plus"></i> Add Task
             </button>
