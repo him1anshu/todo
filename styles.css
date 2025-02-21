@@ -389,6 +389,15 @@ button[disabled] {
 
 /* Mobile Breakpoints */
 @media (max-width: 750px) {
+    #task-dashboard {
+        align-items: flex-start;
+        padding: 0;
+    }
+
+    #task-list, .card {
+        border-radius: 0;
+    }
+
     #task-create-section {
         flex-direction: column;
     }
