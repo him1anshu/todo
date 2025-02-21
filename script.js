@@ -223,16 +223,26 @@ function toggleTaskCompletion(event) {
   const editBtn = document.querySelector(
     `button.edit[data-task-id="${taskId}"]`
   );
+  const taskItem = document.getElementById(`task-item-${taskId}`);
+  const taskFilter = document.getElementById("task-filter");
 
   let status = "pending";
   if (event.target.checked) {
     taskText.style.textDecoration = "line-through";
     editBtn.setAttribute("disabled", "disabled");
     status = "completed";
+
+    if (taskFilter.value === "pending") {
+      taskListContainer.removeChild(taskItem);
+    }
   } else {
     taskText.style.textDecoration = "none";
     editBtn.removeAttribute("disabled");
     editBtn.style.display = "block";
+
+    if (taskFilter.value === "completed") {
+      taskListContainer.removeChild(taskItem);
+    }
   }
 
   tasks = tasks.map((task) =>
@@ -244,7 +254,7 @@ function toggleTaskCompletion(event) {
 
 // Applying filter using dropdown
 const taskFilter = document.getElementById("task-filter");
-taskFilter.addEventListener("click", (event) => {
+taskFilter.addEventListener("change", (event) => {
   const status = event.target.value;
   taskListContainer.innerHTML = "";
 
