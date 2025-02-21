@@ -17,31 +17,37 @@
 <body>
     <header>
         <nav aria-label="Main Navigation">
+            <div class="nav-brand">
+                <!-- Brand logo/text added -->
+                <h1>Task Manager</h1>
+            </div>
             <ul>
-                <li><a href="#" class="active">Tasks</a></li>
+                <!-- <li><a href="#" class="active">Tasks</a></li> -->
+                <!-- You can add more nav items here -->
             </ul>
         </nav>
     </header>
     <main id="task-dashboard">
-        <section id="task-create-section">
-            <section id="task-search">
-                <input type="text" placeholder="Search task.." />
-                <button type="button" id="task-search-btn" class="btn-search" aria-label="Search Task">
-                    <i class="fa-solid fa-search"></i>
+        <section id="task-create-section" class="card">
+            <div class="controls-group">
+                <section id="task-search">
+                    <input type="text" placeholder="Search task..." aria-label="Search task" />
+                    <button type="button" id="task-search-btn" class="btn-search" aria-label="Search Task">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                    <button type="button" id="clear-search-btn" class="btn-search" aria-label="Clear Search">
+                        <i class="fa-solid fa-multiply"></i>
+                    </button>
+                </section>
+                <select name="task-status" id="task-filter" aria-label="Filter Tasks">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
+                    <i class="fa-solid fa-plus"></i> Add Task
                 </button>
-                <button type="button" id="clear-search-btn" class="btn-search" aria-label="Clear Search">
-                    <i class="fa-solid fa-multiply"></i>
-                </button>
-            </section>
-            <select name="task-status" id="task-filter">
-                <option value="">All</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-            </select>
-    
-            <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
-                <i class="fa-solid fa-plus"></i> Add Task
-            </button>
+            </div>
         </section>
         <div id="task-list">
             <!-- Task items will be inserted here dynamically -->
@@ -62,8 +68,12 @@
                     placeholder="Enter additional details..." />
             </div>
             <div class="form-actions">
-                <button type="submit" id="task-create-submit" class="btn-create">Create</button>
-                <button type="button" id="task-create-cancel" class="btn-cancel">Cancel</button>
+                <button type="submit" id="task-create-submit" class="btn-create">
+                    Create
+                </button>
+                <button type="button" id="task-create-cancel" class="btn-cancel">
+                    Cancel
+                </button>
             </div>
         </form>
     </dialog>
@@ -99,10 +109,6 @@
         <form method="dialog" id="task-edit-form">
             <h2>Update Task Details</h2>
             <div class="form-element">
-                <label for="task-edit-id">Task ID</label>
-                <input type="text" name="id" id="task-edit-id" readonly />
-            </div>
-            <div class="form-element">
                 <label for="task-edit-display">Task</label>
                 <input type="text" name="display" id="task-edit-display" required />
             </div>
@@ -119,14 +125,37 @@
                 <input type="text" name="updated_at" id="task-edit-updated" readonly />
             </div>
             <div class="form-actions">
-                <button type="submit" id="task-edit-submit" class="btn-create">Update</button>
-                <button type="button" id="task-edit-cancel" class="btn-cancel">Cancel</button>
+                <button type="submit" id="task-edit-submit" class="btn-create">
+                    Update
+                </button>
+                <button type="button" id="task-edit-cancel" class="btn-cancel">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Delete Task Modal -->
+    <dialog id="task-delete-dialog" class="task-dialog">
+        <form method="dialog" id="task-delete-form">
+            <h2>Delete Task</h2>
+            <div class="form-element">
+                <label for="task-delete-display">Task</label>
+                <input type="text" name="display" id="task-delete-display" readonly />
+            </div>
+            <div class="form-actions">
+                <button type="submit" id="task-delete-submit" class="btn-create">
+                    Delete
+                </button>
+                <button type="button" id="task-delete-cancel" class="btn-cancel">
+                    Cancel
+                </button>
             </div>
         </form>
     </dialog>
 
     <footer id="site-footer">
-        <p>&copy; todo.newskill.host</p>
+        <p>&copy; todo.newskills.host</p>
     </footer>
 </body>
 

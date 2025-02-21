@@ -148,13 +148,39 @@ taskCreateForm.addEventListener("submit", (event) => {
 
 // Delete Task
 function deleteTask(taskId) {
+  const task = tasks.find((task) => task.id === taskId);
+  if (!task) return;
+
+  const taskDeleteDialog = document.getElementById("task-delete-dialog");
+  document.getElementById("task-delete-display").value = task.display;
+
+  const formNode = taskDeleteDialog.children[0];
+  formNode.dataset.taskId = taskId;
+
+  taskDeleteDialog.showModal();
+}
+
+const taskDeleteForm = document.getElementById("task-delete-form");
+taskDeleteForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const taskId = taskDeleteForm.dataset.taskId;
   tasks = tasks.filter((task) => task.id !== taskId);
+
   localStorage.setItem("tasks", JSON.stringify(tasks));
+
   const taskItem = document.getElementById(`task-item-${taskId}`);
   if (taskItem) {
     taskListContainer.removeChild(taskItem);
   }
-}
+
+  document.getElementById("task-delete-dialog").close();
+});
+
+const taskDeleteCancel = document.getElementById("task-delete-cancel");
+taskDeleteCancel.addEventListener("click", () => {
+  document.getElementById("task-delete-dialog").close();
+});
 
 // View Task Details
 function viewTask(taskId) {
@@ -178,12 +204,13 @@ function editTask(taskId) {
 
   const taskEditDialog = document.getElementById("task-edit-dialog");
 
-  document.getElementById("task-edit-id").value = task.id;
   document.getElementById("task-edit-display").value = task.display;
   document.getElementById("task-edit-description").value = task.description;
   document.getElementById("task-edit-created").value = task.created_at;
   document.getElementById("task-edit-updated").value = task.updated_at;
 
+  const formNode = taskEditDialog.children[0];
+  formNode.dataset.taskId = taskId;
   taskEditDialog.showModal();
 }
 
@@ -195,7 +222,7 @@ taskEditForm.addEventListener("submit", (event) => {
   const data = Object.fromEntries(formData.entries());
   data.updated_at = new Date().toLocaleString();
 
-  const taskId = data.id;
+  const taskId = taskEditForm.dataset.taskId;
   tasks = tasks.map((task) =>
     task.id === taskId ? { ...task, ...data } : task
   );
@@ -269,7 +296,10 @@ taskFilter.addEventListener("change", (event) => {
 const searchInput = document.querySelector("#task-search input");
 const searchBtn = document.getElementById("task-search-btn");
 searchBtn.addEventListener("click", () => {
-  const searchText = new RegExp(searchInput.value, "i");
+  const textToSearch = searchInput.value;
+  if (!textToSearch) return;
+
+  const searchText = new RegExp(textToSearch, "i");
   const task = tasks.find((task) => {
     return task.display.match(searchText);
   });
@@ -287,6 +317,8 @@ searchBtn.addEventListener("click", () => {
 // Clear filtered tasks
 const clearSearchBtn = document.getElementById("clear-search-btn");
 clearSearchBtn.addEventListener("click", () => {
+  const taskFilter = document.getElementById("task-filter");
+  taskFilter.value = "";
   taskListContainer.innerHTML = "";
 
   for (const task of tasks) {
