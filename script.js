@@ -1,9 +1,4 @@
-let tasks = null;
-if (localStorage.getItem("tasks")) {
-  tasks = JSON.parse(localStorage.getItem("tasks"));
-} else {
-  tasks = [];
-}
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -11,92 +6,92 @@ function renderTask(task) {
   const taskItem = document.createElement("div");
   taskItem.className = "task-item";
   taskItem.id = `task-item-${task.id}`;
-
-  // Checkbox
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.id = `task-${task.id}-checkbox`;
-  checkbox.name = "completed";
-  checkbox.dataset.action = "checkbox";
-  checkbox.dataset.taskId = task.id;
-
-  if (task.status === "completed") {
-    checkbox.checked = "checked";
+  taskItem.innerHTML = `
+    <div class="task-meta">
+      <input type="checkbox" class="status-toggle" 
+             id="task-${task.id}-checkbox" ${
+    task.status === "completed" ? "checked" : ""
   }
-  taskItem.appendChild(checkbox);
+             data-task-id="${task.id}" data-action="checkbox" />
+      <div class="priority-indicator priority-${getPriorityName(
+        task.priority
+      )}"></div>
+    </div>
+    <div class="task-content">
+      <h3 class="task-title" id="task-${task.id}-text">${task.display}</h3>
+      <div class="task-details">
+        <span class="due-date">
+          <i class="fa-regular fa-calendar"></i> ${formatDate(task["due-date"])}
+        </span>
+        <span class="status-badge status-${task.status}">${task.status}</span>
+      </div>
+    </div>
+    <div class="task-actions">
+      <button class="view-btn" data-action="view" data-task-id="${
+        task.id
+      }" aria-label="View details">
+        <i class="fa-regular fa-eye"></i>
+      </button>
+      <button class="edit-btn" data-action="edit" data-task-id="${task.id}" 
+              ${
+                task.status === "completed" ? "disabled" : ""
+              } aria-label="Edit task">
+        <i class="fa-regular fa-pen-to-square"></i>
+      </button>
+      <button class="delete-btn" data-action="delete" data-task-id="${
+        task.id
+      }" aria-label="Delete task">
+        <i class="fa-regular fa-trash-can"></i>
+      </button>
+    </div>
+  `;
 
-  // Task text
-  const taskText = document.createElement("p");
-  taskText.className = "task-text";
-  taskText.id = `task-${task.id}-text`;
-  taskText.textContent = task.display;
-
+  // Apply completed task styling
+  const taskText = taskItem.querySelector(`#task-${task.id}-text`);
   if (task.status === "completed") {
     taskText.style.textDecoration = "line-through";
+    taskItem.querySelector(".edit-btn").disabled = true;
   }
-  taskItem.appendChild(taskText);
 
-  // View Button
-  const viewBtn = document.createElement("button");
-  viewBtn.type = "button";
-  viewBtn.className = "view";
-  viewBtn.dataset.action = "view";
-  viewBtn.dataset.taskId = task.id;
-  viewBtn.setAttribute("aria-label", "View Task");
-  const viewIcon = document.createElement("i");
-  viewIcon.className = "fa-solid fa-eye";
-  viewBtn.appendChild(viewIcon);
-  taskItem.appendChild(viewBtn);
-
-  // Edit Button
-  const editBtn = document.createElement("button");
-  editBtn.type = "button";
-  editBtn.className = "edit";
-  editBtn.dataset.action = "edit";
-  editBtn.dataset.taskId = task.id;
-  editBtn.setAttribute("aria-label", "Edit Task");
-  const editIcon = document.createElement("i");
-  editIcon.className = "fa-solid fa-pen-to-square";
-
-  if (task.status === "completed") {
-    editBtn.disabled = "disabled";
-  }
-  editBtn.appendChild(editIcon);
-  taskItem.appendChild(editBtn);
-
-  // Delete Button
-  const deleteBtn = document.createElement("button");
-  deleteBtn.type = "button";
-  deleteBtn.className = "delete";
-  deleteBtn.dataset.action = "delete";
-  deleteBtn.dataset.taskId = task.id;
-  deleteBtn.setAttribute("aria-label", "Delete Task");
-  const deleteIcon = document.createElement("i");
-  deleteIcon.className = "fa-solid fa-trash";
-  deleteBtn.appendChild(deleteIcon);
-  taskItem.appendChild(deleteBtn);
-
-  taskListContainer.appendChild(taskItem);
+  return taskItem;
 }
 
+// Helper functions
+function getPriorityName(priorityValue) {
+  const priorities = { 1: "high", 2: "medium", 3: "low" };
+  return priorities[priorityValue] || "low";
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "No due date";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+// Initial render
 window.addEventListener("load", () => {
-  tasks.forEach((task) => renderTask(task));
+  taskListContainer.innerHTML = "";
+  tasks.forEach((task) => {
+    taskListContainer.appendChild(renderTask(task));
+  });
 });
 
+// Event delegation for task actions
 taskListContainer.addEventListener("click", (event) => {
-  // Check if the click target is a checkbox
-  if (event.target.matches('input[type="checkbox"]')) {
-    toggleTaskCompletion(event);
-    return;
-  }
+  const target = event.target.closest("[data-action]");
+  if (!target) return;
 
-  // Otherwise, check for button clicks
-  const targetButton = event.target.closest("button");
-  if (!targetButton) return;
-  const action = targetButton.dataset.action;
-  const taskId = targetButton.dataset.taskId;
+  const action = target.dataset.action;
+  const taskId = target.dataset.taskId;
 
   switch (action) {
+    case "checkbox":
+      toggleTaskCompletion(taskId, target.checked);
+      break;
     case "delete":
       deleteTask(taskId);
       break;
@@ -106,228 +101,210 @@ taskListContainer.addEventListener("click", (event) => {
     case "edit":
       editTask(taskId);
       break;
-    // Note: "checkbox" case is now handled above
   }
 });
 
-// Create Task Dialog and Form
+// Create Task Dialog
 const taskCreateDialog = document.getElementById("task-create-dialog");
-const taskAddBtn = document.getElementById("task-add-btn");
-const taskCreateCancel = document.getElementById("task-create-cancel");
-const taskCreateForm = document.getElementById("task-create-form");
-
-taskAddBtn.addEventListener("click", () => {
+document.getElementById("task-add-btn").addEventListener("click", () => {
   taskCreateDialog.showModal();
 });
-
-taskCreateCancel.addEventListener("click", () => {
+document.getElementById("task-create-cancel").addEventListener("click", () => {
   taskCreateDialog.close();
 });
+document
+  .getElementById("task-create-form")
+  .addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const newTask = {
+      id: Date.now().toString(),
+      display: formData.get("display"),
+      description: formData.get("description"),
+      "due-date": formData.get("due-date"),
+      priority: parseInt(formData.get("priority"), 10),
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-taskCreateForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const formData = new FormData(taskCreateForm);
-  const data = Object.fromEntries(formData.entries());
-
-  data.status = "pending";
-  data.priority = parseInt(data.priority, 10);
-  data.createdAt = new Date().toLocaleString();
-  data.updatedAt = new Date().toLocaleString();
-
-  const lastTask = tasks[tasks.length - 1];
-  data.id = lastTask ? `${parseInt(lastTask.id, 10) + 1}` : "1";
-  tasks.push(data);
-
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-
-  renderTask(data);
-
-  taskCreateForm.reset();
-
-  taskCreateDialog.close();
-});
+    tasks.push(newTask);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    taskListContainer.appendChild(renderTask(newTask));
+    event.target.reset();
+    taskCreateDialog.close();
+  });
 
 // Delete Task
 function deleteTask(taskId) {
-  const task = tasks.find((task) => task.id === taskId);
-  if (!task) return;
-
   const taskDeleteDialog = document.getElementById("task-delete-dialog");
-  document.getElementById("task-delete-display").value = task.display;
-
-  const formNode = taskDeleteDialog.children[0];
-  formNode.dataset.taskId = taskId;
-
+  document.getElementById("task-delete-display").value =
+    tasks.find((task) => task.id === taskId)?.display || "";
+  taskDeleteDialog.dataset.taskId = taskId;
   taskDeleteDialog.showModal();
 }
-
-const taskDeleteForm = document.getElementById("task-delete-form");
-taskDeleteForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const taskId = taskDeleteForm.dataset.taskId;
+document.getElementById("task-delete-form").addEventListener("submit", () => {
+  const taskId = document.getElementById("task-delete-dialog").dataset.taskId;
   tasks = tasks.filter((task) => task.id !== taskId);
-
   localStorage.setItem("tasks", JSON.stringify(tasks));
-
-  const taskItem = document.getElementById(`task-item-${taskId}`);
-  if (taskItem) {
-    taskListContainer.removeChild(taskItem);
-  }
-
+  document.getElementById(`task-item-${taskId}`)?.remove();
+  document.getElementById("task-delete-dialog").close();
+});
+document.getElementById("task-edit-cancel")?.addEventListener("click", () => {
+  document.getElementById("task-edit-dialog").close();
+});
+document.getElementById("task-delete-cancel")?.addEventListener("click", () => {
   document.getElementById("task-delete-dialog").close();
 });
 
-const taskDeleteCancel = document.getElementById("task-delete-cancel");
-taskDeleteCancel.addEventListener("click", () => {
-  document.getElementById("task-delete-dialog").close();
-});
-
-// View Task Details
+// View Task
 function viewTask(taskId) {
   const task = tasks.find((task) => task.id === taskId);
   if (!task) return;
-
-  const taskViewDialog = document.getElementById("task-view-dialog");
-
+  const formatDateTime = (dateString) =>
+    new Date(dateString).toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
   document.getElementById("task-view-display").value = task.display;
   document.getElementById("task-view-description").value = task.description;
-  document.getElementById("task-view-created").value = task.createdAt;
-  document.getElementById("task-view-updated").value = task.updatedAt;
-  document.getElementById("task-view-priority").value = task.priority;
   document.getElementById("task-view-due-date").value = task["due-date"];
-
-  taskViewDialog.showModal();
+  document.getElementById("task-view-priority").value = task.priority;
+  document.getElementById("task-view-created").value = formatDateTime(
+    task.createdAt
+  );
+  document.getElementById("task-view-updated").value = formatDateTime(
+    task.updatedAt
+  );
+  document.getElementById("task-view-dialog").showModal();
 }
 
-// Edit Task Details
+// Edit Task
 function editTask(taskId) {
   const task = tasks.find((task) => task.id === taskId);
   if (!task) return;
-
-  const taskEditDialog = document.getElementById("task-edit-dialog");
-
-  document.getElementById("task-edit-display").value = task.display;
-  document.getElementById("task-edit-description").value = task.description;
-  document.getElementById("task-edit-priority").value = task.priority;
-  document.getElementById("task-edit-due-date").value = task["due-date"];
-
-  const formNode = taskEditDialog.children[0];
-  formNode.dataset.taskId = taskId;
-  taskEditDialog.showModal();
+  const editForm = document.getElementById("task-edit-form");
+  editForm.elements["display"].value = task.display;
+  editForm.elements["description"].value = task.description;
+  editForm.elements["due-date"].value = task["due-date"];
+  editForm.elements["priority"].value = task.priority;
+  editForm.dataset.taskId = taskId;
+  document.getElementById("task-edit-dialog").showModal();
 }
-
-const taskEditForm = document.getElementById("task-edit-form");
-taskEditForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const formData = new FormData(taskEditForm);
-  const data = Object.fromEntries(formData.entries());
-  data.updatedAt = new Date().toLocaleString();
-
-  const taskId = taskEditForm.dataset.taskId;
-  tasks = tasks.map((task) =>
-    task.id === taskId ? { ...task, ...data } : task
-  );
-
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-
-  const taskText = document.getElementById(`task-${taskId}-text`);
-  if (taskText) {
-    taskText.textContent = data.display;
-  }
-
-  taskEditForm.reset();
-
-  document.getElementById("task-edit-dialog").close();
-});
-
-const taskEditCancel = document.getElementById("task-edit-cancel");
-taskEditCancel.addEventListener("click", () => {
-  document.getElementById("task-edit-dialog").close();
-});
-
-function toggleTaskCompletion(event) {
-  const taskId = event.target.dataset.taskId;
-  const taskText = document.getElementById(`task-${taskId}-text`);
-  const editBtn = document.querySelector(
-    `button.edit[data-task-id="${taskId}"]`
-  );
-  const taskItem = document.getElementById(`task-item-${taskId}`);
-  const taskFilter = document.getElementById("task-filter");
-
-  let status = "pending";
-  if (event.target.checked) {
-    taskText.style.textDecoration = "line-through";
-    editBtn.setAttribute("disabled", "disabled");
-    status = "completed";
-
-    if (taskFilter.value === "pending") {
-      taskListContainer.removeChild(taskItem);
+document
+  .getElementById("task-edit-form")
+  .addEventListener("submit", (event) => {
+    event.preventDefault();
+    const taskId = event.target.dataset.taskId;
+    const formData = new FormData(event.target);
+    tasks = tasks.map((task) =>
+      task.id === taskId
+        ? {
+            ...task,
+            display: formData.get("display"),
+            description: formData.get("description"),
+            "due-date": formData.get("due-date"),
+            priority: parseInt(formData.get("priority"), 10),
+            updatedAt: new Date().toISOString(),
+          }
+        : task
+    );
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    const taskItem = document.getElementById(`task-item-${taskId}`);
+    if (taskItem) {
+      const newTask = tasks.find((t) => t.id === taskId);
+      taskListContainer.replaceChild(renderTask(newTask), taskItem);
     }
-  } else {
-    taskText.style.textDecoration = "none";
-    editBtn.removeAttribute("disabled");
-    editBtn.style.display = "block";
-
-    if (taskFilter.value === "completed") {
-      taskListContainer.removeChild(taskItem);
-    }
-  }
-
-  tasks = tasks.map((task) =>
-    task.id === taskId ? { ...task, ...{ status } } : task
-  );
-
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
-
-// Applying filter using dropdown
-const taskFilter = document.getElementById("task-filter");
-taskFilter.addEventListener("change", (event) => {
-  const status = event.target.value;
-  taskListContainer.innerHTML = "";
-
-  for (const task of tasks) {
-    if (!status || task.status === status) {
-      renderTask(task);
-    }
-  }
-});
-
-// Search tasks
-const searchInput = document.querySelector("#task-search input");
-const searchBtn = document.getElementById("task-search-btn");
-searchBtn.addEventListener("click", () => {
-  const textToSearch = searchInput.value;
-  if (!textToSearch) return;
-
-  const searchText = new RegExp(textToSearch, "i");
-  const task = tasks.find((task) => {
-    return task.display.match(searchText);
+    document.getElementById("task-edit-dialog").close();
   });
-  const filteredTasks = task ? [task] : [];
 
-  taskListContainer.innerHTML = "";
+// Toggle Task Completion
+function toggleTaskCompletion(taskId, isChecked) {
+  // Update the task's status in the tasks array
+  const newStatus = isChecked ? "completed" : "pending";
+  tasks = tasks.map((task) =>
+    task.id === taskId
+      ? {
+          ...task,
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+        }
+      : task
+  );
 
-  for (const task of filteredTasks) {
-    renderTask(task);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  const taskItem = document.getElementById(`task-item-${taskId}`);
+  // Get current filter selection
+  const currentFilter = document.getElementById("task-filter").value;
+
+  // If a filter is active and the task's new status doesn't match, remove it from the DOM
+  if (currentFilter && currentFilter !== newStatus) {
+    taskItem && taskItem.remove();
+  } else if (taskItem) {
+    // Otherwise, update the task item in the DOM
+    const statusBadge = taskItem.querySelector(".status-badge");
+    const taskText = taskItem.querySelector(".task-title");
+    const editBtn = taskItem.querySelector(".edit-btn");
+
+    taskText.style.textDecoration = isChecked ? "line-through" : "none";
+    statusBadge.className = `status-badge status-${newStatus}`;
+    statusBadge.textContent = newStatus;
+    editBtn.disabled = isChecked;
   }
+}
 
-  searchInput.value = "";
+// Filter functionality
+document.getElementById("task-filter").addEventListener("change", (event) => {
+  const status = event.target.value;
+  const filteredTasks = status
+    ? tasks.filter((task) => task.status === status)
+    : tasks;
+  taskListContainer.innerHTML = "";
+  filteredTasks.forEach((task) =>
+    taskListContainer.appendChild(renderTask(task))
+  );
 });
 
-// Clear filtered tasks
-const clearSearchBtn = document.getElementById("clear-search-btn");
-clearSearchBtn.addEventListener("click", () => {
-  const taskFilter = document.getElementById("task-filter");
-  taskFilter.value = "";
-  taskListContainer.innerHTML = "";
-
-  for (const task of tasks) {
-    renderTask(task);
+// Sort functionality for "Sort by" select
+document.getElementById("sort-by").addEventListener("change", (event) => {
+  const sortBy = event.target.value;
+  let sortedTasks = [...tasks]; // Create a shallow copy
+  if (sortBy === "due_date") {
+    sortedTasks.sort(
+      (a, b) => new Date(a["due-date"]) - new Date(b["due-date"])
+    );
+  } else if (sortBy === "priority") {
+    sortedTasks.sort((a, b) => a.priority - b.priority);
   }
+  taskListContainer.innerHTML = "";
+  sortedTasks.forEach((task) =>
+    taskListContainer.appendChild(renderTask(task))
+  );
+});
 
-  searchInput.value = "";
+// Search functionality
+document
+  .querySelector("#task-search input")
+  .addEventListener("input", (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    const filteredTasks = tasks.filter(
+      (task) =>
+        task.display.toLowerCase().includes(searchTerm) ||
+        (task.description &&
+          task.description.toLowerCase().includes(searchTerm))
+    );
+    taskListContainer.innerHTML = "";
+    filteredTasks.forEach((task) =>
+      taskListContainer.appendChild(renderTask(task))
+    );
+  });
+
+// Clear Search functionality
+document.getElementById("clear-search-btn").addEventListener("click", () => {
+  document.getElementById("task-filter").value = "";
+  document.getElementById("sort-by").value = "";
+  document.querySelector("#task-search input").value = "";
+  taskListContainer.innerHTML = "";
+  tasks.forEach((task) => taskListContainer.appendChild(renderTask(task)));
 });
