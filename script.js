@@ -2,6 +2,52 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 const taskListContainer = document.getElementById("task-list");
 
+let draggedTaskId = null;
+
+function dragstartHandler(event) {
+  draggedTaskId = event.target.id; // Store the dragged task ID
+  event.dataTransfer.setData("text/plain", draggedTaskId);
+  event.target.classList.add("dragging");
+}
+
+function dragoverHandler(event) {
+  event.preventDefault(); // Allow drop
+  const targetTask = event.target.closest(".task-item");
+  if (!targetTask || targetTask.id === draggedTaskId) return;
+
+  const bounding = targetTask.getBoundingClientRect();
+  const offset = event.clientY - bounding.top;
+  const middle = bounding.height / 2;
+
+  if (offset > middle) {
+    targetTask.parentNode.insertBefore(
+      document.getElementById(draggedTaskId),
+      targetTask.nextSibling
+    );
+  } else {
+    targetTask.parentNode.insertBefore(
+      document.getElementById(draggedTaskId),
+      targetTask
+    );
+  }
+}
+
+function dropHandler(event) {
+  event.preventDefault();
+  event.target.classList.remove("dragging");
+  draggedTaskId = null;
+  updateTaskOrder();
+}
+
+function updateTaskOrder() {
+  const taskElements = [...taskListContainer.children];
+  tasks = taskElements.map((taskEl) => {
+    return tasks.find((task) => `task-item-${task.id}` === taskEl.id);
+  });
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
 function renderTask(task) {
   const taskItem = document.createElement("div");
   taskItem.className = "task-item";
@@ -53,6 +99,10 @@ function renderTask(task) {
     taskItem.querySelector(".edit-btn").disabled = true;
   }
 
+  taskItem.draggable = true;
+
+  taskItem.addEventListener("dragstart", dragstartHandler);
+
   return taskItem;
 }
 
@@ -79,6 +129,9 @@ window.addEventListener("load", () => {
     taskListContainer.appendChild(renderTask(task));
   });
 });
+
+taskListContainer.addEventListener("dragover", dragoverHandler);
+taskListContainer.addEventListener("drop", dropHandler);
 
 // Event delegation for task actions
 taskListContainer.addEventListener("click", (event) => {

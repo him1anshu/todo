@@ -28,20 +28,23 @@ body {
 
 header {
     height: 70px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: var(--primary-color);
-    padding: 1rem 2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 footer {
-    text-align: center;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: var(--primary-color);
-    padding: 1rem 2rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-#site-footer p {
+footer p {
     color: white;
 }
 
@@ -55,7 +58,7 @@ footer {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
-    min-height: calc(100vh - 185px);
+    min-height: calc(100vh - 174px);
 }
 
 .controls-group {
@@ -96,6 +99,7 @@ footer {
 }
 
 .task-dropdown {
+    /* remove default style from dropdown */
     padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -109,6 +113,7 @@ footer {
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
+
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -120,6 +125,7 @@ footer {
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
+
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -135,7 +141,7 @@ footer {
 .task-item {
     display: grid;
     grid-template-columns: auto 1fr auto;
-    align-items: center;
+    /* align-items: center; */
     gap: 1.5rem;
     padding: 1.5rem;
     border-bottom: 1px solid var(--border-color);
@@ -197,8 +203,8 @@ footer {
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.85rem;
-    background: #E9ECEF;
-    color: var(--text-primary);
+    /* background: #E9ECEF; */
+    /* color: var(--text-primary); */
 }
 
 .status-completed {
@@ -250,6 +256,11 @@ dialog::backdrop {
 }
 
 /* Form Styles */
+form h2 {
+    text-align: center;
+    margin-bottom: .5rem;
+}
+
 .form-element {
     margin-bottom: 1.5rem;
 }
@@ -263,6 +274,7 @@ dialog::backdrop {
 
 .form-element input,
 .form-element select {
+    /* reset select initial styles */
     width: 100%;
     padding: 0.8rem;
     border: 1px solid var(--border-color);
@@ -277,7 +289,24 @@ dialog::backdrop {
     margin-top: 2rem;
 }
 
-@media (max-width: 768px) {
+.btn-create, .btn-cancel {
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    padding: 0.5rem 1rem;
+}
+
+.btn-create {
+    color: var(--white);
+    background-color: var(--secondary-color);
+}
+
+.btn-cancel {
+    color: var(--white);
+    background-color: var(--warning-color);
+}
+
+@media (max-width: 900px) {
     .controls-group {
         flex-direction: column;
     }
@@ -285,6 +314,11 @@ dialog::backdrop {
     #task-search,
     .filter-group {
         width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .filter-group .task-dropdown {
+        flex: 1;
     }
 
     .task-item {
@@ -297,14 +331,8 @@ dialog::backdrop {
     }
 }
 
-@media (max-width: 900px) {
-    .filter-group {
-        display: block;
-    }
-
-    .filter-group .task-dropdown,
+@media (max-width: 470px) {
     .filter-group button {
-        width: 100%;
-        margin-bottom: 1rem;
+        flex: 1;
     }
 }
