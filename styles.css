@@ -116,6 +116,22 @@ footer p {
     background-size: 10px auto;
 }
 
+#task-create-due-date {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: #2c3e50;
+    outline: none;
+    /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%232c3e50'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px auto; */
+}
+
+button {
+    cursor: pointer;
+}
+
 #clear-search-btn {
     background: var(--warning-color);
     color: white;
@@ -288,6 +304,10 @@ form h2 {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+}
+
+.form-element input[readonly], select[disabled] {
+    cursor: not-allowed;
 }
 
 .form-actions {
