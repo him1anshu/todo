@@ -99,12 +99,21 @@ footer p {
 }
 
 .task-dropdown {
-    /* remove default style from dropdown */
     padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background-color: white;
     min-width: 150px;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: #2c3e50;
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%232c3e50'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px auto;
 }
 
 #clear-search-btn {
@@ -274,7 +283,6 @@ form h2 {
 
 .form-element input,
 .form-element select {
-    /* reset select initial styles */
     width: 100%;
     padding: 0.8rem;
     border: 1px solid var(--border-color);
