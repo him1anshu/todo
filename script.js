@@ -129,9 +129,11 @@ taskCreateForm.addEventListener("submit", (event) => {
 
   const formData = new FormData(taskCreateForm);
   const data = Object.fromEntries(formData.entries());
-  data.created_at = new Date().toLocaleString();
-  data.updated_at = new Date().toLocaleString();
+
   data.status = "pending";
+  data.priority = parseInt(data.priority, 10);
+  data.createdAt = new Date().toLocaleString();
+  data.updatedAt = new Date().toLocaleString();
 
   const lastTask = tasks[tasks.length - 1];
   data.id = lastTask ? `${parseInt(lastTask.id, 10) + 1}` : "1";
@@ -191,8 +193,10 @@ function viewTask(taskId) {
 
   document.getElementById("task-view-display").value = task.display;
   document.getElementById("task-view-description").value = task.description;
-  document.getElementById("task-view-created").value = task.created_at;
-  document.getElementById("task-view-updated").value = task.updated_at;
+  document.getElementById("task-view-created").value = task.createdAt;
+  document.getElementById("task-view-updated").value = task.updatedAt;
+  document.getElementById("task-view-priority").value = task.priority;
+  document.getElementById("task-view-due-date").value = task["due-date"];
 
   taskViewDialog.showModal();
 }
@@ -206,8 +210,8 @@ function editTask(taskId) {
 
   document.getElementById("task-edit-display").value = task.display;
   document.getElementById("task-edit-description").value = task.description;
-  document.getElementById("task-edit-created").value = task.created_at;
-  document.getElementById("task-edit-updated").value = task.updated_at;
+  document.getElementById("task-edit-priority").value = task.priority;
+  document.getElementById("task-edit-due-date").value = task["due-date"];
 
   const formNode = taskEditDialog.children[0];
   formNode.dataset.taskId = taskId;
@@ -220,7 +224,7 @@ taskEditForm.addEventListener("submit", (event) => {
 
   const formData = new FormData(taskEditForm);
   const data = Object.fromEntries(formData.entries());
-  data.updated_at = new Date().toLocaleString();
+  data.updatedAt = new Date().toLocaleString();
 
   const taskId = taskEditForm.dataset.taskId;
   tasks = tasks.map((task) =>

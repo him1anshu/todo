@@ -36,7 +36,7 @@
                         <i class="fa-solid fa-search"></i>
                     </button>
                 </section>
-                <select name="task-status" id="task-filter" aria-label="Filter Tasks">
+                <select name="task-status" id="task-filter" class="task-dropdown" aria-label="Filter Tasks">
                     <option value="" disabled selected>Status</option>
                     <option value="pending">Pending</option>
                     <option value="completed">Completed</option>
@@ -67,6 +67,19 @@
                 <input type="text" name="description" id="task-create-description"
                     placeholder="Enter additional details..." />
             </div>
+            <div class="form-element">
+                <label for="task-create-due-date">Due Date</label>
+                <input type="datetime-local" name="due-date" id="task-create-due-date" required />
+            </div>
+            <div class="form-element">
+                <label for="task-create-priority">Priority</label>
+                <select name="priority" id="task-create-priority" class="task-dropdown" required>
+                    <option value="" selected disabled>Select Priority</option>
+                    <option value="1">High</option>
+                    <option value="2">Medium</option>
+                    <option value="3">Low</option>
+                </select>
+            </div>
             <div class="form-actions">
                 <button type="submit" id="task-create-submit" class="btn-create">
                     Create
@@ -84,11 +97,24 @@
             <h2>Task Details</h2>
             <div class="form-element">
                 <label for="task-view-display">Task</label>
-                <input type="text" name="display" id="task-view-display" required readonly />
+                <input type="text" name="display" id="task-view-display" readonly />
             </div>
             <div class="form-element">
                 <label for="task-view-description">Details</label>
                 <input type="text" name="description" id="task-view-description" readonly />
+            </div>
+            <div class="form-element">
+                <label for="task-view-due-date">Due Date</label>
+                <input type="datetime-local" name="due-date" id="task-view-due-date" readonly/>
+            </div>
+            <div class="form-element">
+                <label for="task-view-priority">Priority</label>
+                <select name="priority" id="task-view-priority" class="task-dropdown" disabled>
+                    <option value="" selected disabled>Select Priority</option>
+                    <option value="1">High</option>
+                    <option value="2">Medium</option>
+                    <option value="3">Low</option>
+                </select>
             </div>
             <div class="form-element">
                 <label for="task-view-created">Created at</label>
@@ -117,12 +143,17 @@
                 <input type="text" name="description" id="task-edit-description" />
             </div>
             <div class="form-element">
-                <label for="task-edit-created">Created at</label>
-                <input type="text" name="created_at" id="task-edit-created" readonly />
+                <label for="task-edit-due-date">Due Date</label>
+                <input type="datetime-local" name="due-date" id="task-edit-due-date" />
             </div>
             <div class="form-element">
-                <label for="task-edit-updated">Updated at</label>
-                <input type="text" name="updated_at" id="task-edit-updated" readonly />
+                <label for="task-edit-priority">Priority</label>
+                <select name="priority" id="task-edit-priority" class="task-dropdown">
+                    <option value="" selected disabled>Select Priority</option>
+                    <option value="1">High</option>
+                    <option value="2">Medium</option>
+                    <option value="3">Low</option>
+                </select>
             </div>
             <div class="form-actions">
                 <button type="submit" id="task-edit-submit" class="btn-create">

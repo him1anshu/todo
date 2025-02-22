@@ -148,7 +148,7 @@ nav a:hover:not(.active) {
 }
 
 /* Select Filter */
-#task-filter {
+.task-dropdown {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -165,7 +165,7 @@ nav a:hover:not(.active) {
     background-size: 10px auto;
 }
 
-#task-filter option {
+.task-dropdown option {
     background-color: #ffffff;
     color: #2c3e50;
 }
@@ -402,7 +402,7 @@ button[disabled] {
         flex-direction: column;
     }
 
-    #task-filter,
+    .task-dropdown,
     #task-add-btn, #clear-search-btn {
         margin-top: 0.313rem;
         width: 100%;
