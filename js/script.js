@@ -159,14 +159,18 @@ taskListContainer.addEventListener("click", (event) => {
 
 // Create Task Dialog
 const taskCreateDialog = document.getElementById("task-create-dialog");
-document.getElementById("task-add-btn").addEventListener("click", () => {
+function showCreateTaskModal() {
   const dueDateInput = document.getElementById("task-create-due-date");
   const now = new Date();
   dueDateInput.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, 16);
   taskCreateDialog.showModal();
-});
+}
+
+document
+  .getElementById("task-add-btn")
+  .addEventListener("click", showCreateTaskModal);
 document.getElementById("task-create-cancel").addEventListener("click", () => {
   taskCreateDialog.close();
 });
@@ -375,11 +379,36 @@ document
     );
   });
 
-// Clear Search functionality
-document.getElementById("clear-search-btn").addEventListener("click", () => {
+// Clear filter functionality
+function clearFilters() {
   document.getElementById("task-filter").value = "";
   document.getElementById("sort-by").value = "";
   document.querySelector("#task-search input").value = "";
   taskListContainer.innerHTML = "";
   tasks.forEach((task) => taskListContainer.appendChild(renderTask(task)));
+}
+
+document
+  .getElementById("clear-search-btn")
+  .addEventListener("click", clearFilters);
+
+/* (ALT + N) Key binding to create new task */
+document.addEventListener("keydown", (event) => {
+  if (event.altKey && event.key.toLocaleLowerCase() === "n") {
+    showCreateTaskModal();
+  }
+});
+
+/* (ALT + R) Key binding to clear all filters */
+document.addEventListener("keydown", (event) => {
+  if (event.altKey && event.key.toLocaleLowerCase() === "r") {
+    clearFilters();
+  }
+});
+
+/* (ALT + S) Key binding to search tasks */
+document.addEventListener("keydown", (event) => {
+  if (event.altKey && event.key.toLocaleLowerCase() === "s") {
+    document.querySelector("#task-search input").focus();
+  }
 });
