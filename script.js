@@ -160,6 +160,11 @@ taskListContainer.addEventListener("click", (event) => {
 // Create Task Dialog
 const taskCreateDialog = document.getElementById("task-create-dialog");
 document.getElementById("task-add-btn").addEventListener("click", () => {
+  const dueDateInput = document.getElementById("task-create-due-date");
+  const now = new Date();
+  dueDateInput.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
   taskCreateDialog.showModal();
 });
 document.getElementById("task-create-cancel").addEventListener("click", () => {
@@ -241,6 +246,14 @@ function editTask(taskId) {
   editForm.elements["description"].value = task.description;
   editForm.elements["due-date"].value = task["due-date"];
   editForm.elements["priority"].value = task.priority;
+
+  const now = new Date();
+  editForm.elements["due-date"].min = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .slice(0, 16);
+
   editForm.dataset.taskId = taskId;
   document.getElementById("task-edit-dialog").showModal();
 }
