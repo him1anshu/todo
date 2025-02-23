@@ -1,193 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Google Fonts: Roboto -->
+    <meta name="description" content="A simple and efficient task management application." />
+    <meta name="keywords" content="task manager, productivity, to-do list, task tracking" />
+    <meta name="author" content="todo.newskills.host" />
+    <meta property="og:title" content="Task Manager" />
+    <meta property="og:description" content="Organize and manage your tasks efficiently with Task Manager." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://todo.newskills.host" />
+    <meta property="og:image" content="https://todo.newskills.host/og-image.png" />
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Task Manager",
+          "url": "https://todo.newskills.host",
+          "description": "A simple and efficient task management application.",
+          "author": {
+            "@type": "Person",
+            "name": "todo.newskills.host"
+          }
+        }
+      </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="script.js"></script>
-    <title>Tasks</title>
-</head>
-
-<body>
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <script defer src="./js/script.js"></script>
+    <link rel="icon" type="image/png" href="./assets/task-manager-logo.png">
+    <title>Task Manager | A simple and efficient task management application.</title>
+  </head>
+  <body>
     <header>
-        <nav aria-label="Main Navigation">
-            <div class="nav-brand">
-                <!-- Brand logo/text added -->
-                <h1>Task Manager</h1>
-            </div>
-            <ul>
-                <!-- <li><a href="#" class="active">Tasks</a></li> -->
-                <!-- You can add more nav items here -->
-            </ul>
-        </nav>
-    </header>
-    <main id="task-dashboard">
-        <section id="task-create-section" class="card">
-            <div class="controls-group">
-                <section id="task-search">
-                    <input type="text" placeholder="Search task..." aria-label="Search task" />
-                    <button type="button" id="task-search-btn" class="btn-search" aria-label="Search Task">
-                        <i class="fa-solid fa-search"></i>
-                    </button>
-                </section>
-                <select name="task-status" id="task-filter" class="task-dropdown" aria-label="Filter Tasks">
-                    <option value="" disabled selected>Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                </select>
-                <button type="button" id="clear-search-btn" class="btn-search" aria-label="Clear Search">
-                    Clear
-                </button>
-                <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
-                    <i class="fa-solid fa-plus"></i> Add Task
-                </button>
-            </div>
-        </section>
-        <div id="task-list">
-            <!-- Task items will be inserted here dynamically -->
+      <nav aria-label="Main Navigation">
+        <div class="nav-brand">
+          <h1>Task Manager</h1>
         </div>
+      </nav>
+    </header>
+
+    <main id="task-dashboard">
+      <section class="controls-group">
+        <section id="task-search">
+          <input type="text" placeholder="Search tasks..." aria-label="Search tasks" />
+          <button type="button" id="task-search-btn" aria-label="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </section>
+
+        <div class="filter-group">
+          <select id="task-filter" class="task-dropdown" aria-label="Filter by status">
+            <option value="" selected disabled>All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+
+          <select id="sort-by" class="task-dropdown" aria-label="Sort by">
+            <option value="" selected disabled>Sort By</option>
+            <option value="due_date">Due Date</option>
+            <option value="priority">Priority</option>
+          </select>
+
+          <button type="button" id="clear-search-btn" aria-label="Clear filters">
+            <i class="fa-solid fa-eraser"></i> Reset
+          </button>
+        </div>
+
+        <button type="button" id="task-add-btn" class="btn-add" aria-label="Add Task">
+          <i class="fa-solid fa-plus"></i> New Task
+        </button>
+      </section>
+
+      <!-- Task List -->
+      <div id="task-list">
+        <!-- Example Task Item -->
+        <!-- <div class="task-item">
+          <div class="task-meta">
+            <input type="checkbox" class="status-toggle" />
+            <div class="priority-indicator priority-high"></div>
+          </div>
+          <div class="task-content">
+            <h3 class="task-title">Complete Project Proposal</h3>
+            <div class="task-details">
+              <span class="due-date">
+                <i class="fa-regular fa-calendar"></i> 2024-03-15
+              </span>
+              <span class="status-badge status-pending">Pending</span>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="view-btn" aria-label="View details">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+            <button class="edit-btn" aria-label="Edit task">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </button>
+            <button class="delete-btn" aria-label="Delete task">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div> -->
+      </div>
     </main>
 
+    <!-- Modal dialogs remain unchanged -->
     <!-- Create Task Modal -->
     <dialog id="task-create-dialog" class="task-dialog">
-        <form method="dialog" id="task-create-form">
-            <h2>Create New Task</h2>
-            <div class="form-element">
-                <label for="task-create-display">Task</label>
-                <input type="text" name="display" id="task-create-display" placeholder="Enter task..." required />
-            </div>
-            <div class="form-element">
-                <label for="task-create-description">Details</label>
-                <input type="text" name="description" id="task-create-description"
-                    placeholder="Enter additional details..." />
-            </div>
-            <div class="form-element">
-                <label for="task-create-due-date">Due Date</label>
-                <input type="datetime-local" name="due-date" id="task-create-due-date" required />
-            </div>
-            <div class="form-element">
-                <label for="task-create-priority">Priority</label>
-                <select name="priority" id="task-create-priority" class="task-dropdown" required>
-                    <option value="" selected disabled>Select Priority</option>
-                    <option value="1">High</option>
-                    <option value="2">Medium</option>
-                    <option value="3">Low</option>
-                </select>
-            </div>
-            <div class="form-actions">
-                <button type="submit" id="task-create-submit" class="btn-create">
-                    Create
-                </button>
-                <button type="button" id="task-create-cancel" class="btn-cancel">
-                    Cancel
-                </button>
-            </div>
-        </form>
+      <form method="dialog" id="task-create-form">
+        <h2>Create New Task</h2>
+        <div class="form-element">
+          <label for="task-create-display">Task</label>
+          <input type="text" name="display" id="task-create-display" placeholder="Enter task..." required />
+        </div>
+        <div class="form-element">
+          <label for="task-create-description">Details</label>
+          <textarea name="description" id="task-create-description" placeholder="Enter additional details..." rows="5"></textarea>
+        </div>
+        <div class="form-element">
+          <label for="task-create-due-date">Due Date</label>
+          <input type="datetime-local" name="due-date" id="task-create-due-date" class="task-due-date" required />
+        </div>
+        <div class="form-element">
+          <label for="task-create-priority">Priority</label>
+          <select name="priority" id="task-create-priority" class="task-dropdown" required>
+            <option value="" selected disabled>Select Priority</option>
+            <option value="1">High</option>
+            <option value="2">Medium</option>
+            <option value="3">Low</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="task-create-submit" class="btn-create">Create</button>
+          <button type="button" id="task-create-cancel" class="btn-cancel">Cancel</button>
+        </div>
+      </form>
     </dialog>
 
     <!-- View Task Modal -->
     <dialog id="task-view-dialog" class="task-dialog">
-        <form method="dialog" id="task-view-form">
-            <h2>Task Details</h2>
-            <div class="form-element">
-                <label for="task-view-display">Task</label>
-                <input type="text" name="display" id="task-view-display" readonly />
-            </div>
-            <div class="form-element">
-                <label for="task-view-description">Details</label>
-                <input type="text" name="description" id="task-view-description" readonly />
-            </div>
-            <div class="form-element">
-                <label for="task-view-due-date">Due Date</label>
-                <input type="datetime-local" name="due-date" id="task-view-due-date" readonly/>
-            </div>
-            <div class="form-element">
-                <label for="task-view-priority">Priority</label>
-                <select name="priority" id="task-view-priority" class="task-dropdown" disabled>
-                    <option value="" selected disabled>Select Priority</option>
-                    <option value="1">High</option>
-                    <option value="2">Medium</option>
-                    <option value="3">Low</option>
-                </select>
-            </div>
-            <div class="form-element">
-                <label for="task-view-created">Created at</label>
-                <input type="text" name="created_at" id="task-view-created" readonly />
-            </div>
-            <div class="form-element">
-                <label for="task-view-updated">Updated at</label>
-                <input type="text" name="updated_at" id="task-view-updated" readonly />
-            </div>
-            <div class="form-actions">
-                <button type="submit" id="task-view-close" class="btn-create">Close</button>
-            </div>
-        </form>
+      <form method="dialog" id="task-view-form">
+        <h2>Task Details</h2>
+        <div class="form-element">
+          <label for="task-view-display">Task</label>
+          <input type="text" name="display" id="task-view-display" readonly />
+        </div>
+        <div class="form-element">
+          <label for="task-view-description">Details</label>
+          <textarea name="description" id="task-view-description" rows="5" readonly></textarea>
+        </div>
+        <div class="form-element">
+          <label for="task-view-due-date">Due Date</label>
+          <input type="datetime-local" name="due-date" id="task-view-due-date" readonly />
+        </div>
+        <div class="form-element">
+          <label for="task-view-priority">Priority</label>
+          <select name="priority" id="task-view-priority" class="task-dropdown" disabled>
+            <option value="" selected disabled>Select Priority</option>
+            <option value="1">High</option>
+            <option value="2">Medium</option>
+            <option value="3">Low</option>
+          </select>
+        </div>
+        <div class="form-element">
+          <label for="task-view-created">Created at</label>
+          <input type="text" name="created_at" id="task-view-created" readonly />
+        </div>
+        <div class="form-element">
+          <label for="task-view-updated">Updated at</label>
+          <input type="text" name="updated_at" id="task-view-updated" readonly />
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="task-view-close" class="btn-cancel">Close</button>
+        </div>
+      </form>
     </dialog>
 
     <!-- Edit Task Modal -->
     <dialog id="task-edit-dialog" class="task-dialog">
-        <form method="dialog" id="task-edit-form">
-            <h2>Update Task Details</h2>
-            <div class="form-element">
-                <label for="task-edit-display">Task</label>
-                <input type="text" name="display" id="task-edit-display" required />
-            </div>
-            <div class="form-element">
-                <label for="task-edit-description">Details</label>
-                <input type="text" name="description" id="task-edit-description" />
-            </div>
-            <div class="form-element">
-                <label for="task-edit-due-date">Due Date</label>
-                <input type="datetime-local" name="due-date" id="task-edit-due-date" />
-            </div>
-            <div class="form-element">
-                <label for="task-edit-priority">Priority</label>
-                <select name="priority" id="task-edit-priority" class="task-dropdown">
-                    <option value="" selected disabled>Select Priority</option>
-                    <option value="1">High</option>
-                    <option value="2">Medium</option>
-                    <option value="3">Low</option>
-                </select>
-            </div>
-            <div class="form-actions">
-                <button type="submit" id="task-edit-submit" class="btn-create">
-                    Update
-                </button>
-                <button type="button" id="task-edit-cancel" class="btn-cancel">
-                    Cancel
-                </button>
-            </div>
-        </form>
+      <form method="dialog" id="task-edit-form">
+        <h2>Update Task Details</h2>
+        <div class="form-element">
+          <label for="task-edit-display">Task</label>
+          <input type="text" name="display" id="task-edit-display" required />
+        </div>
+        <div class="form-element">
+          <label for="task-edit-description">Details</label>
+          <textarea name="description" id="task-edit-description" rows="5"></textarea>
+        </div>
+        <div class="form-element">
+          <label for="task-edit-due-date">Due Date</label>
+          <input type="datetime-local" name="due-date" id="task-edit-due-date" class="task-due-date" />
+        </div>
+        <div class="form-element">
+          <label for="task-edit-priority">Priority</label>
+          <select name="priority" id="task-edit-priority" class="task-dropdown">
+            <option value="" selected disabled>Select Priority</option>
+            <option value="1">High</option>
+            <option value="2">Medium</option>
+            <option value="3">Low</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="task-edit-submit" class="btn-create">Update</button>
+          <button type="button" id="task-edit-cancel" class="btn-cancel">Cancel</button>
+        </div>
+      </form>
     </dialog>
 
     <!-- Delete Task Modal -->
     <dialog id="task-delete-dialog" class="task-dialog">
-        <form method="dialog" id="task-delete-form">
-            <h2>Delete Task</h2>
-            <div class="form-element">
-                <label for="task-delete-display">Task</label>
-                <input type="text" name="display" id="task-delete-display" readonly />
-            </div>
-            <div class="form-actions">
-                <button type="submit" id="task-delete-submit" class="btn-create">
-                    Delete
-                </button>
-                <button type="button" id="task-delete-cancel" class="btn-cancel">
-                    Cancel
-                </button>
-            </div>
-        </form>
+      <form method="dialog" id="task-delete-form">
+        <h2>Delete Task</h2>
+        <div class="form-element">
+          <label for="task-delete-display">Task</label>
+          <input type="text" name="display" id="task-delete-display" readonly />
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="task-delete-submit" class="btn-create">Delete</button>
+          <button type="button" id="task-delete-cancel" class="btn-cancel">Cancel</button>
+        </div>
+      </form>
     </dialog>
 
     <footer id="site-footer">
-        <p>&copy; todo.newskills.host</p>
+      <p>&copy; todo.newskills.host</p>
     </footer>
-</body>
-
+  </body>
 </html>
