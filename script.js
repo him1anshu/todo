@@ -48,7 +48,7 @@ function updateTaskOrder() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-function renderTask(task) {
+function renderTask(task, isDraggable = true) {
   const taskItem = document.createElement("div");
   taskItem.className = "task-item";
   taskItem.id = `task-item-${task.id}`;
@@ -99,7 +99,7 @@ function renderTask(task) {
     taskItem.querySelector(".edit-btn").disabled = true;
   }
 
-  taskItem.draggable = true;
+  taskItem.draggable = isDraggable;
 
   taskItem.addEventListener("dragstart", dragstartHandler);
 
@@ -328,14 +328,23 @@ document.getElementById("task-filter").addEventListener("change", (event) => {
     : tasks;
   taskListContainer.innerHTML = "";
   filteredTasks.forEach((task) =>
-    taskListContainer.appendChild(renderTask(task))
+    taskListContainer.appendChild(renderTask(task, false))
   );
 });
 
 // Sort functionality for "Sort by" select
 document.getElementById("sort-by").addEventListener("change", (event) => {
+  let sortedTasks = null;
+  const taskStatus = document.getElementById("task-filter").value;
+  if (taskStatus) {
+    sortedTasks = tasks.filter((task) => {
+      return task.status === taskStatus;
+    });
+  } else {
+    sortedTasks = [...tasks];
+  }
+
   const sortBy = event.target.value;
-  let sortedTasks = [...tasks]; // Create a shallow copy
   if (sortBy === "due_date") {
     sortedTasks.sort(
       (a, b) => new Date(a["due-date"]) - new Date(b["due-date"])
@@ -345,7 +354,7 @@ document.getElementById("sort-by").addEventListener("change", (event) => {
   }
   taskListContainer.innerHTML = "";
   sortedTasks.forEach((task) =>
-    taskListContainer.appendChild(renderTask(task))
+    taskListContainer.appendChild(renderTask(task, false))
   );
 });
 

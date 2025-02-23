@@ -302,12 +302,16 @@ form h2 {
 }
 
 .form-element input,
-.form-element select {
+.form-element select, .form-element textarea {
     width: 100%;
     padding: 0.8rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+}
+
+textarea {
+    resize: none;
 }
 
 .form-element input[readonly], select[disabled] {
