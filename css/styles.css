@@ -1,60 +1,137 @@
 :root {
-    --primary-color: #2A3B4D;
-    --secondary-color: #1a76df;
+    /* Application Bar (Header & Footer) Background */
+    --app-bar-bg: #2A3B4D;
+    /* was --primary-color */
+
+    /* Primary Button Background (e.g., Task Add, Create) */
+    --btn-primary-bg: #1a76df;
+    /* was --secondary-color */
+
+    /* Accent / Interactive Color */
     --accent-color: #7FDBFF;
-    --success-color: #00C851;
-    --warning-color: #e74b4b;
-    --background-light: #eff1f3;
-    --text-primary: #2A3B4D;
-    --text-secondary: #6C757D;
+
+    /* Status: Success (e.g., Task Completed) */
+    --status-success-color: #00C851;
+
+    /* Button / Action: Danger Background (e.g., Clear Search, Cancel) */
+    --btn-danger-bg: #e74b4b;
+    /* was --warning-color */
+
+    /* Page / Body Background */
+    --body-bg: #eff1f3;
+    /* was --background-light */
+
+    /* Main Text Color */
+    --text-main: #2A3B4D;
+    /* was --text-primary */
+
+    /* Alternate / Secondary Text Color */
+    --text-alt: #6C757D;
+    /* was --text-secondary */
+
+    /* Border Color */
     --border-color: #E0E0E0;
-    --white: #FFFFFF;
-    --priority-high: #e74c3c;
-    --priority-medium: #f39c12;
-    --priority-low: #f1c40f;
-    --task-dropdown-color: #2c3e50;
-    --text-color-white: #fff;
-    --task-status-pending-bg: #FFF3CD;
-    --task-status-completed-bg: #D4EDDA;
-    --task-status-pending-text: #856404;
-    --task-status-completed-text: #155724;
-    --checkbox-bg: #ccc;
 
-    --task-actions-btn-color-hover: #222;
+    /* Surface Background (Forms, Modals, Inputs, Containers) */
+    --surface-bg: #FFFFFF;
+    /* was --white */
 
-    --box-shadow-primary: 0 2px 8px rgba(0, 0, 0, 0.1);
-    
+    /* Priority Colors */
+    --priority-high-color: #e74c3c;
+    /* was --priority-high */
+    --priority-medium-color: #f39c12;
+    /* was --priority-medium */
+    --priority-low-color: #f1c40f;
+    /* was --priority-low */
+
+    /* Dropdown Icon Color */
+    --dropdown-icon-color: #2c3e50;
+    /* was --task-dropdown-color */
+
+    /* Inverse Text Color (for dark backgrounds like header/footer) */
+    --inverse-text-color: #fff;
+    /* was --text-color-white */
+
+    /* Status Badge Colors */
+    --status-pending-bg: #FFF3CD;
+    /* was --task-status-pending-bg */
+    --status-completed-bg: #D4EDDA;
+    /* was --task-status-completed-bg */
+    --status-pending-text: #856404;
+    /* was --task-status-pending-text */
+    --status-completed-text: #155724;
+    /* was --task-status-completed-text */
+
+    /* Checkbox Default Background */
+    --checkbox-default-bg: #ccc;
+    /* was --checkbox-bg */
+
+    /* Action Button Hover Color */
+    --action-btn-hover-color: #222;
+    /* was --task-actions-btn-color-hover */
+
+    /* Main Shadow for Headers, Footers, etc. */
+    --shadow-main: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* light mode box-shadow */
+
+    /* Due Date Colors */
+    --duedate-invalid: #e74b4b;
+    --duedate-valid: #2c3e50;
 }
 
 [data-theme="dark"] {
-    --primary-color: #1E272E;
-    --secondary-color: #00b894;
-    /* Vibrant teal */
+    --app-bar-bg: #1E272E;
+    --btn-primary-bg: #00b894;
     --accent-color: #48C9B0;
-    --success-color: #2ECC71;
-    --warning-color: #E74C3C;
-    --background-light: #121212;
-    --text-primary: #ECF0F1;
-    --text-secondary: #bdc3c7;
-    /* Brighter gray */
+    --status-success-color: #2ECC71;
+    --btn-danger-bg: #E74C3C;
+    --body-bg: #121212;
+    --text-main: #ECF0F1;
+    --text-alt: #bdc3c7;
     --border-color: #2c3e50;
-    /* Darker border */
-    --white: #000;
+    --surface-bg: #1C1C1C;
+    /* optimized dark surface background */
+    --priority-high-color: #ff6b6b;
+    --priority-medium-color: #ff9f43;
+    --priority-low-color: #feca57;
+    --dropdown-icon-color: #ECF0F1;
+    /* brighter for dark mode */
+    --inverse-text-color: #fff;
+    --status-pending-bg: rgba(255, 193, 7, 0.15);
+    --status-completed-bg: rgba(40, 167, 69, 0.15);
+    --status-pending-text: #ffc107;
+    --status-completed-text: #28a745;
+    --checkbox-default-bg: #444;
+    /* darker checkbox background */
+    --action-btn-hover-color: #fff;
 
-    --priority-high: #ff6b6b;
-    --priority-medium: #ff9f43;
-    --priority-low: #feca57;
+    /* Subtler shadow for dark surfaces */
+    --shadow-main: 0 2px 8px rgba(0, 0, 0, 0.3);
 
-    --task-status-pending-bg: rgba(255, 193, 7, 0.15);
-    --task-status-completed-bg: rgba(40, 167, 69, 0.15);
-    --task-status-pending-text: #ffc107;
-    --task-status-completed-text: #28a745;
+    /* Due Date Colors for better contrast in dark mode */
+    --duedate-invalid: #fff;
+    --duedate-valid: #bdc3c7;
 
-    --task-actions-btn-color-hover: #fff;
-
-    --box-shadow-primary: 0 2px 8px rgba(255, 255, 255, 0.1);
-
+    /* Override dropdown icon for dark mode */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%23ffffff'/%3E%3C/svg%3E");
+}
+
+/* Dialog adjustments for dark mode */
+[data-theme="dark"] .task-dialog h2 {
+    color: #ffffff;
+    /* ensures header text is clearly visible */
+}
+
+[data-theme="dark"] .task-dialog .btn-create {
+    background-color: #008a75;
+    /* muted teal for create button */
+    color: #ffffff;
+}
+
+[data-theme="dark"] .task-dialog .btn-cancel {
+    background-color: #c0392b;
+    /* muted red for cancel button */
+    color: #ffffff;
 }
 
 /* Reset & Base Styles */
@@ -66,7 +143,7 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--background-light);
+    background-color: var(--body-bg);
     transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -76,8 +153,8 @@ header {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background-color: var(--primary-color);
-    box-shadow: var(--box-shadow-primary);
+    background-color: var(--app-bar-bg);
+    box-shadow: var(--shadow-main);
 }
 
 nav {
@@ -100,7 +177,7 @@ nav {
 .toggle-theme button {
     background: none;
     border: none;
-    color: var(--text-color-white);
+    color: var(--inverse-text-color);
     padding: 0.5rem;
     cursor: pointer;
     height: 3rem;
@@ -117,16 +194,16 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--primary-color);
-    box-shadow: var(--box-shadow-primary);
+    background-color: var(--app-bar-bg);
+    box-shadow: var(--shadow-main);
 }
 
 footer p {
-    color: var(--text-color-white);
+    color: var(--inverse-text-color);
 }
 
 .nav-brand h1 {
-    color: var(--text-color-white);
+    color: var(--inverse-text-color);
     font-weight: 300;
     font-size: 1.8rem;
 }
@@ -151,13 +228,20 @@ footer p {
     min-width: 250px;
 }
 
+/* Updated search bar styles with explicit text color */
 #task-search input {
     width: 100%;
     padding: 0.8rem 2rem 0.8rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
-    background-color: var(--white);
+    background-color: var(--surface-bg);
+    color: var(--text-main);
+}
+
+/* Optional: placeholder text color */
+#task-search input::placeholder {
+    color: var(--text-alt);
 }
 
 #task-search-btn {
@@ -167,7 +251,7 @@ footer p {
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-alt);
 }
 
 .filter-group {
@@ -180,13 +264,12 @@ footer p {
     padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    background-color: var(--white);
+    background-color: var(--surface-bg);
     min-width: 150px;
-
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    color: var(--text-primary);
+    color: var(--text-main);
     outline: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%232c3e50'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -194,20 +277,17 @@ footer p {
     background-size: 10px auto;
 }
 
-/* .task-due-date {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    color: #2c3e50;
-    outline: none;
-} */
+/* Optionally override dropdown icon in dark theme */
+[data-theme="dark"] .task-dropdown {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%23ffffff'/%3E%3C/svg%3E");
+}
 
 .task-due-date:invalid {
-    color: var(--warning-color);
+    color: var(--duedate-invalid);
 }
 
 .task-due-date:valid {
-    color: #2c3e50;
+    color: var(--duedate-valid);
 }
 
 button {
@@ -215,20 +295,19 @@ button {
 }
 
 #clear-search-btn {
-    background: var(--warning-color);
-    color: var(--text-color-white);
+    background: var(--btn-danger-bg);
+    color: var(--inverse-text-color);
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
-
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 #task-add-btn {
-    background: var(--secondary-color);
-    color: var(--text-color-white);
+    background: var(--btn-primary-bg);
+    color: var(--inverse-text-color);
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -236,11 +315,34 @@ button {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Task List Styles */
+#task-add-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: skewX(-30deg);
+    animation: shine 1s ease-in-out infinite;
+}
+
+@keyframes shine {
+    from {
+        left: -100%;
+    }
+
+    to {
+        left: 100%;
+    }
+}
+
 #task-list {
-    background: var(--white);
+    background: var(--surface-bg);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -261,6 +363,7 @@ button {
     display: flex;
     align-items: center;
     gap: 1rem;
+    z-index: 2;
 }
 
 .task-meta input[type=checkbox] {
@@ -268,10 +371,9 @@ button {
     -webkit-appearance: none;
     width: 20px;
     height: 20px;
-    background-color: var(--checkbox-bg);
-    border: 2px solid var(--checkbox-bg);
+    background-color: var(--checkbox-default-bg);
+    border: 2px solid var(--checkbox-default-bg);
     border-radius: 4px;
-    /* transform: translateY(-0.075em); */
     cursor: pointer;
     display: grid;
     place-content: center;
@@ -283,9 +385,8 @@ input[type="checkbox"]::before {
     height: 12px;
     transform: scale(0);
     transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em var(--white);
+    box-shadow: inset 1em 1em var(--surface-bg);
     border-radius: 4px;
-
     transform-origin: bottom left;
     clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
@@ -294,15 +395,15 @@ input[type="checkbox"]:checked::before {
     transform: scale(1);
 }
 
-input[type="checkbox"]:hover, input[type="checkbox"]:focus {
-    outline: max(2px, 0.15em) solid var(--checkbox-bg);
+input[type="checkbox"]:hover,
+input[type="checkbox"]:focus {
+    outline: max(2px, 0.15em) solid var(--checkbox-default-bg);
     outline-offset: max(2px, 0.15em);
 }
 
 input[type="checkbox"]:disabled {
-    --form-control-color: var(--primary-color);
-
-    color: var(--primary-color);
+    --form-control-color: var(--app-bar-bg);
+    color: var(--app-bar-bg);
     cursor: not-allowed;
 }
 
@@ -313,15 +414,59 @@ input[type="checkbox"]:disabled {
 }
 
 .priority-high {
-    background-color: var(--priority-high);
+    background-color: var(--priority-high-color);
+    position: relative;
 }
 
 .priority-medium {
-    background-color: var(--priority-medium);
+    background-color: var(--priority-medium-color);
+    position: relative;
 }
 
 .priority-low {
-    background-color: var(--priority-low);
+    background-color: var(--priority-low-color);
+    position: relative;
+}
+
+.priority-high::after,
+.priority-medium::after,
+.priority-low::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    z-index: -1;
+    animation: pulse 0.5s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
+}
+
+.priority-high::after {
+    background-color: var(--priority-high-color);
+    animation: pulse .5s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
+}
+
+.priority-medium::after {
+    background-color: var(--priority-medium-color);
+    animation: pulse 1s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
+}
+
+.priority-low::after {
+    background-color: var(--priority-low-color);
+    animation: pulse 1.5s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.6);
+        opacity: 0.4;
+    }
 }
 
 .task-content {
@@ -332,14 +477,14 @@ input[type="checkbox"]:disabled {
 
 .task-title {
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text-main);
 }
 
 .task-details {
     display: flex;
     gap: 1rem;
     align-items: center;
-    color: var(--text-secondary);
+    color: var(--text-alt);
 }
 
 .due-date {
@@ -352,18 +497,16 @@ input[type="checkbox"]:disabled {
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.85rem;
-    /* background: #E9ECEF; */
-    /* color: var(--text-primary); */
 }
 
 .status-completed {
-    background: var(--task-status-completed-bg);
-    color: var(--task-status-completed-text);
+    background: var(--status-completed-bg);
+    color: var(--status-completed-text);
 }
 
 .status-pending {
-    background: var(--task-status-pending-bg);
-    color: var(--task-status-pending-text);
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
 }
 
 .task-actions {
@@ -374,18 +517,17 @@ input[type="checkbox"]:disabled {
 .task-actions button {
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-alt);
     padding: 0.5rem;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
 .task-actions button:hover {
-    color: var(--task-actions-btn-color-hover);
+    color: var(--action-btn-hover-color);
     transform: scale(1.2);
 }
 
-/* Modal Styles */
 .task-dialog {
     position: fixed;
     top: 50%;
@@ -397,18 +539,16 @@ input[type="checkbox"]:disabled {
     width: 90%;
     max-width: 500px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    background: var(--white);
+    background: var(--surface-bg);
 }
 
-/* Backdrop for dialog */
 dialog::backdrop {
     background: rgba(0, 0, 0, 0.3);
 }
 
-/* Form Styles */
 form h2 {
     text-align: center;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 }
 
 .form-element {
@@ -418,26 +558,28 @@ form h2 {
 .form-element label {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    color: var(--text-main);
     font-weight: 500;
 }
 
 .form-element input,
-.form-element select, .form-element textarea {
+.form-element select,
+.form-element textarea {
     width: 100%;
     padding: 0.8rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
-    background-color: var(--white);
-    color: var(--text-primary);
+    background-color: var(--surface-bg);
+    color: var(--text-main);
 }
 
 textarea {
     resize: none;
 }
 
-.form-element input[readonly], select[disabled] {
+.form-element input[readonly],
+select[disabled] {
     cursor: not-allowed;
 }
 
@@ -448,7 +590,8 @@ textarea {
     margin-top: 2rem;
 }
 
-.btn-create, .btn-cancel {
+.btn-create,
+.btn-cancel {
     border: none;
     border-radius: 8px;
     outline: none;
@@ -456,13 +599,13 @@ textarea {
 }
 
 .btn-create {
-    color: var(--text-color-white);
-    background-color: var(--secondary-color);
+    color: var(--inverse-text-color);
+    background-color: var(--btn-primary-bg);
 }
 
 .btn-cancel {
-    color: var(--text-color-white);
-    background-color: var(--warning-color);
+    color: var(--inverse-text-color);
+    background-color: var(--btn-danger-bg);
 }
 
 @media (max-width: 900px) {
@@ -496,90 +639,8 @@ textarea {
     }
 }
 
-/* Animations */
-
-/* Pulse animation on task add button */
-#task-add-btn {
-    position: relative;
-    overflow: hidden;
-}
-
-/* Shine effect */
-#task-add-btn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: skewX(-30deg);
-}
-
-/* Animation */
-#task-add-btn::before {
-    animation: shine 1s ease-in-out infinite;
-}
-
-@keyframes shine {
-    from {
-        left: -100%;
-    }
-
-    to {
-        left: 100%;
-    }
-}
-
-/* Pulse animation on task priority indicator */
-.task-meta {
-    z-index: 2;
-}
-
-.priority-high, .priority-medium, .priority-low {
-    position: relative;
-}
-
-.priority-high::after, .priority-medium::after, .priority-low::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    z-index: -1;
-}
-
-.priority-high::after, .priority-medium::after, .priority-low::after {
-    background-color: var(--priority-high);
-    animation: pulse .5s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
-}
-
-.priority-medium::after {
-    background-color: var(--priority-medium);
-    animation: pulse 1s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
-}
-
-.priority-low::after {
-    background-color: var(--priority-low);
-    animation: pulse 1.5s cubic-bezier(0.9, 0.7, 0.5, 0.9) infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-
-    50% {
-        transform: scale(1.6);
-        opacity: 0.4;
-    }
-}
-
-/* pop animation on task dialog */
-.task-dialog, .task-dialog::backdrop {
+.task-dialog,
+.task-dialog::backdrop {
     animation: pop 1s ease-in-out;
 }
 
