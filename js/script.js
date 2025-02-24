@@ -124,6 +124,19 @@ function formatDate(dateString) {
 
 // Initial render
 window.addEventListener("load", () => {
+  // Load theme from localStorage
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  const themeToggle = document.getElementById("theme-toggle");
+  const themeBtn = document.createElement("button");
+  if (savedTheme === "dark") {
+    themeBtn.innerHTML = `<i class="fa-solid fa-sun fa-xl"></i>`;
+  } else {
+    themeBtn.innerHTML = `<i class="fa-solid fa-moon fa-xl"></i>`;
+  }
+  themeToggle.appendChild(themeBtn);
+
   taskListContainer.innerHTML = "";
   tasks.forEach((task) => {
     taskListContainer.appendChild(renderTask(task));
@@ -410,5 +423,23 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.altKey && event.key.toLocaleLowerCase() === "s") {
     document.querySelector("#task-search input").focus();
+  }
+});
+
+/* Toggle between light and dark theme */
+const toggleButton = document.getElementById("theme-toggle");
+
+toggleButton.addEventListener("click", () => {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
+
+  const themeBtn = document.querySelector("#theme-toggle button");
+  if (newTheme === "dark") {
+    themeBtn.innerHTML = `<i class="fa-solid fa-sun fa-xl"></i>`;
+  } else {
+    themeBtn.innerHTML = `<i class="fa-solid fa-moon fa-xl"></i>`;
   }
 });

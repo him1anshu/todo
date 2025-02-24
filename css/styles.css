@@ -1,12 +1,9 @@
 :root {
     --primary-color: #2A3B4D;
-    /* --secondary-color: #4A90E2; */
     --secondary-color: #1a76df;
     --accent-color: #7FDBFF;
     --success-color: #00C851;
-    /* --warning-color: #FF6B6B; */
     --warning-color: #e74b4b;
-    /* --background-light: #F8F9FA; */
     --background-light: #eff1f3;
     --text-primary: #2A3B4D;
     --text-secondary: #6C757D;
@@ -15,6 +12,40 @@
     --priority-high: #e74c3c;
     --priority-medium: #f39c12;
     --priority-low: #f1c40f;
+    --task-dropdown-color: #2c3e50;
+    --text-color-white: #fff;
+    --task-status-pending-bg: #FFF3CD;
+    --task-status-completed-bg: #D4EDDA;
+    --task-status-pending-text: #856404;
+    --task-status-completed-text: #155724;
+    --checkbox-bg: #ccc;
+
+    --task-actions-btn-color-hover: #222;
+
+    --box-shadow-primary: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+}
+
+[data-theme="dark"] {
+    --primary-color: #1E272E;
+    --secondary-color: rgb(8, 202, 8);
+    --accent-color: #48C9B0;
+    --success-color: #2ECC71;
+    --warning-color: #E74C3C;
+    --background-light: #121212;
+    --text-primary: #ECF0F1;
+    --text-secondary: #95A5A6;
+    --border-color: #34495E;
+    --white: #000;
+    --task-dropdown-color: #2c3e50;
+    --text-color-white: #fff;
+    --checkbox-bg: #555;
+    --task-actions-btn-color-hover:#eee;
+
+    --task-status-pending-bg: #333;
+    --task-status-completed-bg: #333;
+    --task-status-pending-text: #eee;
+    --task-status-completed-text: #eee;
 }
 
 /* Reset & Base Styles */
@@ -31,11 +62,44 @@ body {
 
 header {
     height: 70px;
+    width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     background-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow-primary);
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-brand {
+    text-align: center;
+    justify-self: center;
+    flex-grow: 1;
+}
+
+.toggle-theme {
+    justify-self: end;
+    margin-right: 1rem;
+}
+
+.toggle-theme button {
+    background: none;
+    border: none;
+    color: var(--text-color-white);
+    padding: 0.5rem;
+    cursor: pointer;
+    height: 3rem;
+    width: 3rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.toggle-theme button:hover {
+    transform: scale(1.2);
 }
 
 footer {
@@ -44,15 +108,15 @@ footer {
     justify-content: center;
     align-items: center;
     background-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow-primary);
 }
 
 footer p {
-    color: white;
+    color: var(--text-color-white);
 }
 
 .nav-brand h1 {
-    color: white;
+    color: var(--text-color-white);
     font-weight: 300;
     font-size: 1.8rem;
 }
@@ -83,6 +147,7 @@ footer p {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+    background-color: var(--white);
 }
 
 #task-search-btn {
@@ -105,13 +170,13 @@ footer p {
     padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    background-color: white;
+    background-color: var(--white);
     min-width: 150px;
 
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    color: #2c3e50;
+    color: var(--text-primary);
     outline: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%232c3e50'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -141,7 +206,7 @@ button {
 
 #clear-search-btn {
     background: var(--warning-color);
-    color: white;
+    color: var(--text-color-white);
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -153,7 +218,7 @@ button {
 
 #task-add-btn {
     background: var(--secondary-color);
-    color: white;
+    color: var(--text-color-white);
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -165,7 +230,7 @@ button {
 
 /* Task List Styles */
 #task-list {
-    background: white;
+    background: var(--white);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -186,6 +251,49 @@ button {
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+.task-meta input[type=checkbox] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: var(--checkbox-bg);
+    border: 2px solid var(--checkbox-bg);
+    border-radius: 4px;
+    /* transform: translateY(-0.075em); */
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+}
+
+input[type="checkbox"]::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--white);
+    border-radius: 4px;
+
+    transform-origin: bottom left;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+input[type="checkbox"]:hover, input[type="checkbox"]:focus {
+    outline: max(2px, 0.15em) solid var(--checkbox-bg);
+    outline-offset: max(2px, 0.15em);
+}
+
+input[type="checkbox"]:disabled {
+    --form-control-color: var(--primary-color);
+
+    color: var(--primary-color);
+    cursor: not-allowed;
 }
 
 .priority-indicator {
@@ -239,13 +347,13 @@ button {
 }
 
 .status-completed {
-    background: #D4EDDA;
-    color: #155724;
+    background: var(--task-status-completed-bg);
+    color: var(--task-status-completed-text);
 }
 
 .status-pending {
-    background: #FFF3CD;
-    color: #856404;
+    background: var(--task-status-pending-bg);
+    color: var(--task-status-pending-text);
 }
 
 .task-actions {
@@ -263,7 +371,7 @@ button {
 }
 
 .task-actions button:hover {
-    color: var(--primary-color);
+    color: var(--task-actions-btn-color-hover);
     transform: scale(1.2);
 }
 
@@ -311,6 +419,8 @@ form h2 {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+    background-color: var(--white);
+    color: var(--text-primary);
 }
 
 textarea {

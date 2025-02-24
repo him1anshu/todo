@@ -17,9 +17,9 @@
 
 ## **Advanced Features**
 
-1. **Undo/Redo Functionality** – Implement a history stack for actions.
-2. **Offline Support** – Use Service Workers or IndexedDB.
-3. **Dark Mode Toggle** – Work with themes using CSS variables.
+1. **Dark Mode Toggle** – Work with themes using CSS variables.
+2. **Undo/Redo Functionality** – Implement a history stack for actions.
+3. **Offline Support** – Use Service Workers or IndexedDB.
 4. **Custom Context Menu** – Replace the default right-click menu with a custom UI.
 5. **Notifications & Reminders** – Use the Notification API.
 6. **Progress Tracker** – Show completion percentage visually.
