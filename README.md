@@ -30,7 +30,7 @@
 2. **PWA (Progressive Web App)** – Make the app installable.
 3. **Sync with a Backend (Optional)** – Use Fetch API to interact with an API.
 
-## Making your task website SEO-friendly involves optimizing it for search engines like Google. Here’s a structured approach to improve its SEO:
+## Making your task website SEO-friendly involves optimizing it for search engines like Google. Here’s a structured approach to improve its SEO
 
 ### **1. Optimize Page Structure & Content**
 

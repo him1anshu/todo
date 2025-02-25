@@ -73,7 +73,7 @@
         <h3 class="task-title" id="task-${task.id}-text">${task.display}</h3>
         <div class="task-details">
           <span class="due-date">
-            <i class="fa-regular fa-calendar"></i> ${formatDate(
+            <i class="fa-regular fa-calendar"></i> ${formatDateTime(
               task["due-date"]
             )}
           </span>
@@ -130,6 +130,12 @@
     });
   }
 
+  const formatDateTime = (dateString) =>
+    new Date(dateString).toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+
   /*========================
     Task Operations
   ========================*/
@@ -167,11 +173,7 @@
   function viewTask(taskId) {
     const task = tasks.find((task) => task.id === taskId);
     if (!task) return;
-    const formatDateTime = (dateString) =>
-      new Date(dateString).toLocaleString("en-US", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      });
+
     document.getElementById("task-view-display").value = task.display;
     document.getElementById("task-view-description").value = task.description;
     document.getElementById("task-view-due-date").value = task["due-date"];
@@ -351,11 +353,14 @@
     .querySelector("#task-search input")
     .addEventListener("input", (event) => {
       const searchTerm = event.target.value.toLowerCase();
-      const filteredTasks = tasks.filter(
-        (task) =>
-          task.display.toLowerCase().includes(searchTerm) ||
-          (task.description &&
-            task.description.toLowerCase().includes(searchTerm))
+      // const filteredTasks = tasks.filter(
+      //   (task) =>
+      //     task.display.toLowerCase().includes(searchTerm) ||
+      //     (task.description &&
+      //       task.description.toLowerCase().includes(searchTerm))
+      // );
+      const filteredTasks = tasks.filter((task) =>
+        task.display.toLowerCase().includes(searchTerm)
       );
       taskListContainer.innerHTML = "";
       filteredTasks.forEach((task) =>
