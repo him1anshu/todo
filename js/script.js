@@ -2,8 +2,67 @@
   /*========================
     Data & DOM References
   ========================*/
-  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
   const taskListContainer = document.getElementById("task-list");
+
+  let tasks = [];
+  let db;
+
+  const DB_NAME = "tasks-app-db";
+  const DB_VERSION = 1;
+  const DB_STORE_NAME = "tasks";
+
+  function renderAllTasks() {
+    const objectStore = getObjectStore("tasks", "readonly");
+    const request = objectStore.openCursor();
+    request.addEventListener("success", (event) => {
+      const cursor = event.target.result;
+      if (cursor) {
+        const taskItem = renderTask(cursor.value);
+        taskListContainer.appendChild(taskItem);
+        cursor.continue();
+      } else {
+        console.log("No more entries!");
+      }
+    });
+  }
+
+  function getObjectStore(store_name, mode) {
+    const transaction = db.transaction(store_name, mode);
+    return transaction.objectStore(store_name);
+  }
+
+  function openDBConnection() {
+    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.addEventListener("upgradeneeded", (event) => {
+      db = event.target.result; // Assign db
+
+      db.addEventListener("error", (event) => {
+        console.error(`Database error: ${event.target.error?.message}`);
+      });
+
+      const objectStore = db.createObjectStore(DB_STORE_NAME, {
+        keyPath: "id",
+      });
+
+      objectStore.createIndex("id", "id", { unique: true });
+      objectStore.createIndex("display", "display", { unique: false });
+    });
+
+    request.addEventListener("success", (event) => {
+      db = event.target.result;
+      console.log("Database connection established successfully!");
+
+      renderAllTasks();
+    });
+
+    request.addEventListener("error", (event) => {
+      console.error(
+        "Application not allowed to use IndexedDB for storage, please allow it."
+      );
+    });
+  }
 
   /*========================
     Drag & Drop Handlers
@@ -120,15 +179,15 @@
     return priorities[priorityValue] || "low";
   }
 
-  function formatDate(dateString) {
-    if (!dateString) return "No due date";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
+  // function formatDate(dateString) {
+  //   if (!dateString) return "No due date";
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString("en-US", {
+  //     year: "numeric",
+  //     month: "short",
+  //     day: "numeric",
+  //   });
+  // }
 
   const formatDateTime = (dateString) =>
     new Date(dateString).toLocaleString("en-US", {
@@ -146,7 +205,19 @@
         ? { ...task, status: newStatus, updatedAt: new Date().toISOString() }
         : task
     );
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    // localStorage.setItem("tasks", JSON.stringify(tasks));
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.get(taskId);
+    request.addEventListener("success", (event) => {
+      const task = event.target.result;
+      task.status = newStatus;
+
+      const requestUpdate = objectStore.put(task);
+      requestUpdate.addEventListener("success", (event) => {
+        console.log(`Task updated with status: ${newStatus}.`);
+      });
+    });
+
     const taskItem = document.getElementById(`task-item-${taskId}`);
     const currentFilter = document.getElementById("task-filter").value;
     if (currentFilter && currentFilter !== newStatus) {
@@ -155,6 +226,7 @@
       const statusBadge = taskItem.querySelector(".status-badge");
       const taskText = taskItem.querySelector(".task-title");
       const editBtn = taskItem.querySelector(".edit-btn");
+
       taskText.style.textDecoration = isChecked ? "line-through" : "none";
       statusBadge.className = `status-badge status-${newStatus}`;
       statusBadge.textContent = newStatus;
@@ -163,46 +235,61 @@
   }
 
   function deleteTask(taskId) {
-    const taskDeleteDialog = document.getElementById("task-delete-dialog");
-    document.getElementById("task-delete-display").value =
-      tasks.find((task) => task.id === taskId)?.display || "";
-    taskDeleteDialog.dataset.taskId = taskId;
-    taskDeleteDialog.showModal();
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.get(taskId);
+    request.addEventListener("success", (event) => {
+      const task = event.target.result;
+      if (!task) return;
+
+      const taskDeleteDialog = document.getElementById("task-delete-dialog");
+      document.getElementById("task-delete-display").value = task.display;
+      taskDeleteDialog.dataset.taskId = taskId;
+      taskDeleteDialog.showModal();
+    });
   }
 
   function viewTask(taskId) {
-    const task = tasks.find((task) => task.id === taskId);
-    if (!task) return;
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.get(taskId);
+    request.addEventListener("success", (event) => {
+      const task = event.target.result;
+      if (!task) return;
 
-    document.getElementById("task-view-display").value = task.display;
-    document.getElementById("task-view-description").value = task.description;
-    document.getElementById("task-view-due-date").value = task["due-date"];
-    document.getElementById("task-view-priority").value = task.priority;
-    document.getElementById("task-view-created").value = formatDateTime(
-      task.createdAt
-    );
-    document.getElementById("task-view-updated").value = formatDateTime(
-      task.updatedAt
-    );
-    document.getElementById("task-view-dialog").showModal();
+      document.getElementById("task-view-display").value = task.display;
+      document.getElementById("task-view-description").value = task.description;
+      document.getElementById("task-view-due-date").value = task["due-date"];
+      document.getElementById("task-view-priority").value = task.priority;
+      document.getElementById("task-view-created").value = formatDateTime(
+        task.createdAt
+      );
+      document.getElementById("task-view-updated").value = formatDateTime(
+        task.updatedAt
+      );
+      document.getElementById("task-view-dialog").showModal();
+    });
   }
 
   function editTask(taskId) {
-    const task = tasks.find((task) => task.id === taskId);
-    if (!task) return;
-    const editForm = document.getElementById("task-edit-form");
-    editForm.elements["display"].value = task.display;
-    editForm.elements["description"].value = task.description;
-    editForm.elements["due-date"].value = task["due-date"];
-    editForm.elements["priority"].value = task.priority;
-    const now = new Date();
-    editForm.elements["due-date"].min = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60000
-    )
-      .toISOString()
-      .slice(0, 16);
-    editForm.dataset.taskId = taskId;
-    document.getElementById("task-edit-dialog").showModal();
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.get(taskId);
+    request.addEventListener("success", (event) => {
+      const task = event.target.result;
+      if (!task) return;
+
+      const editForm = document.getElementById("task-edit-form");
+      editForm.elements["display"].value = task.display;
+      editForm.elements["description"].value = task.description;
+      editForm.elements["due-date"].value = task["due-date"];
+      editForm.elements["priority"].value = task.priority;
+      const now = new Date();
+      editForm.elements["due-date"].min = new Date(
+        now.getTime() - now.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .slice(0, 16);
+      editForm.dataset.taskId = taskId;
+      document.getElementById("task-edit-dialog").showModal();
+    });
   }
 
   /*========================
@@ -240,17 +327,28 @@
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      tasks.push(newTask);
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      taskListContainer.appendChild(renderTask(newTask));
-      event.target.reset();
-      document.getElementById("task-create-dialog").close();
+
+      const objectStore = getObjectStore("tasks", "readwrite");
+      const request = objectStore.add(newTask);
+      request.addEventListener("success", (dbEvent) => {
+        console.log("New task added successfully!!");
+        taskListContainer.appendChild(renderTask(newTask));
+        event.target.reset();
+        document.getElementById("task-create-dialog").close();
+      });
     });
 
   document.getElementById("task-delete-form").addEventListener("submit", () => {
     const taskId = document.getElementById("task-delete-dialog").dataset.taskId;
-    tasks = tasks.filter((task) => task.id !== taskId);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    // tasks = tasks.filter((task) => task.id !== taskId);
+    // localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.delete(taskId);
+    request.addEventListener("success", (event) => {
+      console.log(`Task deleted.`);
+    });
+
     document.getElementById(`task-item-${taskId}`)?.remove();
     document.getElementById("task-delete-dialog").close();
   });
@@ -270,25 +368,27 @@
       event.preventDefault();
       const taskId = event.target.dataset.taskId;
       const formData = new FormData(event.target);
-      tasks = tasks.map((task) =>
-        task.id === taskId
-          ? {
-              ...task,
-              display: formData.get("display"),
-              description: formData.get("description"),
-              "due-date": formData.get("due-date"),
-              priority: parseInt(formData.get("priority"), 10),
-              updatedAt: new Date().toISOString(),
-            }
-          : task
-      );
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      const taskItem = document.getElementById(`task-item-${taskId}`);
-      if (taskItem) {
-        const newTask = tasks.find((t) => t.id === taskId);
-        taskListContainer.replaceChild(renderTask(newTask), taskItem);
-      }
-      document.getElementById("task-edit-dialog").close();
+
+      const objectStore = getObjectStore("tasks", "readwrite");
+      const request = objectStore.get(taskId);
+      request.addEventListener("success", (event) => {
+        const task = event.target.result;
+
+        task.display = formData.get("display");
+        task.description = formData.get("description");
+        task["due-date"] = formData.get("due-date");
+        task.priority = parseInt(formData.get("priority"), 10);
+        task.updatedAt = new Date().toISOString();
+
+        const requestUpdate = objectStore.put(task);
+        requestUpdate.addEventListener("success", (event) => {
+          const taskItem = document.getElementById(`task-item-${taskId}`);
+          if (taskItem) {
+            taskListContainer.replaceChild(renderTask(task), taskItem);
+          }
+          document.getElementById("task-edit-dialog").close();
+        });
+      });
     });
 
   /*========================
@@ -320,60 +420,89 @@
   ========================*/
   document.getElementById("task-filter").addEventListener("change", (event) => {
     const status = event.target.value;
-    const filteredTasks = status
-      ? tasks.filter((task) => task.status === status)
-      : tasks;
     taskListContainer.innerHTML = "";
-    filteredTasks.forEach((task) =>
-      taskListContainer.appendChild(renderTask(task, false))
-    );
+
+    const objectStore = getObjectStore("tasks", "readonly");
+    const request = objectStore.openCursor();
+    request.addEventListener("success", (idbEvent) => {
+      const cursor = idbEvent.target.result;
+      if (cursor) {
+        const task = cursor.value;
+        if (task.status === status) {
+          const taskItem = renderTask(task);
+          taskListContainer.appendChild(taskItem, false);
+        }
+        cursor.continue();
+      }
+    });
   });
 
   document.getElementById("sort-by").addEventListener("change", (event) => {
-    let sortedTasks = document.getElementById("task-filter").value
-      ? tasks.filter(
-          (task) => task.status === document.getElementById("task-filter").value
-        )
-      : [...tasks];
-    const sortBy = event.target.value;
-    if (sortBy === "due_date") {
-      sortedTasks.sort(
-        (a, b) => new Date(a["due-date"]) - new Date(b["due-date"])
-      );
-    } else if (sortBy === "priority") {
-      sortedTasks.sort((a, b) => a.priority - b.priority);
-    }
-    taskListContainer.innerHTML = "";
-    sortedTasks.forEach((task) =>
-      taskListContainer.appendChild(renderTask(task, false))
-    );
+    const isTaskFilterApplied = document.getElementById("task-filter").value;
+    const tasksToBeSorted = [];
+
+    const objectStore = getObjectStore("tasks", "readonly");
+    const request = objectStore.openCursor();
+    request.addEventListener("success", (idbEvent) => {
+      const cursor = idbEvent.target.result;
+      if (cursor) {
+        const task = cursor.value;
+        if (isTaskFilterApplied) {
+          if (task.status === isTaskFilterApplied) {
+            tasksToBeSorted.push(task);
+          }
+        } else {
+          tasksToBeSorted.push(task);
+        }
+        cursor.continue();
+      } else {
+        const sortBy = event.target.value;
+        if (sortBy === "due_date") {
+          tasksToBeSorted.sort(
+            (a, b) => new Date(a["due-date"]) - new Date(b["due-date"])
+          );
+        } else if (sortBy === "priority") {
+          tasksToBeSorted.sort((a, b) => a.priority - b.priority);
+        }
+
+        taskListContainer.innerHTML = "";
+
+        tasksToBeSorted.forEach((task) =>
+          taskListContainer.appendChild(renderTask(task, false))
+        );
+      }
+    });
   });
 
   document
     .querySelector("#task-search input")
     .addEventListener("input", (event) => {
       const searchTerm = event.target.value.toLowerCase();
-      // const filteredTasks = tasks.filter(
-      //   (task) =>
-      //     task.display.toLowerCase().includes(searchTerm) ||
-      //     (task.description &&
-      //       task.description.toLowerCase().includes(searchTerm))
-      // );
-      const filteredTasks = tasks.filter((task) =>
-        task.display.toLowerCase().includes(searchTerm)
-      );
       taskListContainer.innerHTML = "";
-      filteredTasks.forEach((task) =>
-        taskListContainer.appendChild(renderTask(task))
-      );
+
+      const objectStore = getObjectStore("tasks", "readonly");
+      const request = objectStore.openCursor();
+      request.addEventListener("success", (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          const task = cursor.value;
+          if (task.display.toLowerCase().includes(searchTerm)) {
+            const taskItem = renderTask(cursor.value);
+            taskListContainer.appendChild(taskItem);
+          }
+          cursor.continue();
+        }
+      });
     });
 
   function clearFilters() {
     document.getElementById("task-filter").value = "";
     document.getElementById("sort-by").value = "";
     document.querySelector("#task-search input").value = "";
+
     taskListContainer.innerHTML = "";
-    tasks.forEach((task) => taskListContainer.appendChild(renderTask(task)));
+
+    renderAllTasks();
   }
 
   document
@@ -455,6 +584,7 @@
   window.addEventListener("load", () => {
     const savedTheme = localStorage.getItem("theme") || "light";
     document.documentElement.setAttribute("data-theme", savedTheme);
+
     const themeToggle = document.getElementById("theme-toggle");
     const themeBtn = document.createElement("button");
     themeBtn.innerHTML =
@@ -462,9 +592,12 @@
         ? `<i class="fa-solid fa-sun fa-xl"></i>`
         : `<i class="fa-solid fa-moon fa-xl"></i>`;
     themeToggle.appendChild(themeBtn);
+
     updateDatePickerTheme();
+
     taskListContainer.innerHTML = "";
-    tasks.forEach((task) => taskListContainer.appendChild(renderTask(task)));
+
+    openDBConnection();
   });
 
   /*========================
