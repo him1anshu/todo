@@ -7,21 +7,29 @@
 
   let tasks = [];
   let db;
+  let latestPosition;
 
   const DB_NAME = "tasks-app-db";
   const DB_VERSION = 1;
   const DB_STORE_NAME = "tasks";
 
   function renderAllTasks() {
+    let maxPositionValue = 0;
     const objectStore = getObjectStore("tasks", "readonly");
-    const request = objectStore.openCursor();
+    const index = objectStore.index("position");
+    const request = index.openCursor();
     request.addEventListener("success", (event) => {
       const cursor = event.target.result;
       if (cursor) {
+        maxPositionValue =
+          maxPositionValue < cursor.value.position
+            ? cursor.value.position
+            : maxPositionValue;
         const taskItem = renderTask(cursor.value);
         taskListContainer.appendChild(taskItem);
         cursor.continue();
       } else {
+        latestPosition = maxPositionValue;
         console.log("No more entries!");
       }
     });
@@ -48,6 +56,7 @@
 
       objectStore.createIndex("id", "id", { unique: true });
       objectStore.createIndex("display", "display", { unique: false });
+      objectStore.createIndex("position", "position", { unique: false });
     });
 
     request.addEventListener("success", (event) => {
@@ -70,18 +79,22 @@
   let draggedTaskId = null;
 
   function dragstartHandler(event) {
-    draggedTaskId = event.target.id;
+    const taskItem = event.target.closest(".task-item");
+    if (!taskItem) return;
+    draggedTaskId = taskItem.id;
     event.dataTransfer.setData("text/plain", draggedTaskId);
-    event.target.classList.add("dragging");
+    taskItem.classList.add("dragging");
   }
 
   function dragoverHandler(event) {
     event.preventDefault(); // Allow drop
     const targetTask = event.target.closest(".task-item");
     if (!targetTask || targetTask.id === draggedTaskId) return;
+
     const bounding = targetTask.getBoundingClientRect();
     const offset = event.clientY - bounding.top;
     const middle = bounding.height / 2;
+
     if (offset > middle) {
       targetTask.parentNode.insertBefore(
         document.getElementById(draggedTaskId),
@@ -97,17 +110,31 @@
 
   function dropHandler(event) {
     event.preventDefault();
-    event.target.classList.remove("dragging");
+    const draggedElement = document.getElementById(draggedTaskId);
+    if (draggedElement) {
+      draggedElement.classList.remove("dragging");
+    }
     draggedTaskId = null;
     updateTaskOrder();
   }
 
   function updateTaskOrder() {
-    const taskElements = [...taskListContainer.children];
-    tasks = taskElements.map((taskEl) =>
-      tasks.find((task) => `task-item-${task.id}` === taskEl.id)
-    );
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const taskLists = [...taskListContainer.children];
+    let counter = 1;
+    for (const taskItem of taskLists) {
+      const [, taskId] = taskItem.id.split("task-item-");
+      const request = objectStore.get(taskId);
+      request.addEventListener("success", (event) => {
+        const task = event.target.result;
+        task.position = counter++;
+
+        const updateRequest = objectStore.put(task);
+        updateRequest.addEventListener("success", (updateEvent) => {
+          console.log("success");
+        });
+      });
+    }
   }
 
   /*========================
@@ -119,6 +146,9 @@
     taskItem.id = `task-item-${task.id}`;
     taskItem.innerHTML = `
       <div class="task-meta">
+        <div class="task-drag-container">
+            <div class="task-drag" id="task-${task.id}-drag"></div>
+        </div>
         <input type="checkbox" class="status-toggle" 
                id="task-${task.id}-checkbox" ${
       task.status === "completed" ? "checked" : ""
@@ -166,8 +196,15 @@
       taskItem.querySelector(".edit-btn").disabled = true;
     }
 
-    taskItem.draggable = isDraggable;
-    taskItem.addEventListener("dragstart", dragstartHandler);
+    // Find the drag handle and attach the event to it
+    const dragHandle = taskItem.querySelector(`#task-${task.id}-drag`);
+    if (isDraggable) {
+      dragHandle.draggable = true;
+      dragHandle.addEventListener("dragstart", dragstartHandler);
+    } else {
+      const taskMeta = taskItem.querySelector(`.task-meta`);
+      taskMeta.removeChild(dragHandle);
+    }
     return taskItem;
   }
 
@@ -319,6 +356,7 @@
       const formData = new FormData(event.target);
       const newTask = {
         id: Date.now().toString(),
+        position: ++latestPosition,
         display: formData.get("display"),
         description: formData.get("description"),
         "due-date": formData.get("due-date"),

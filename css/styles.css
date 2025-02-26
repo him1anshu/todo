@@ -345,6 +345,7 @@ button {
     background: var(--surface-bg);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
 .task-item {
@@ -364,6 +365,40 @@ button {
     align-items: center;
     gap: 1rem;
     z-index: 2;
+}
+
+.task-drag-container {
+    display: flex;
+    align-items: center;
+    height: 1.5rem;
+    cursor: grab;
+}
+
+.task-drag {
+    height: 4px;
+    width: 1.5rem;
+    position: relative;
+    border-radius: 4px;
+    background-color: var(--checkbox-default-bg);
+}
+
+.task-drag::before,
+.task-drag::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background-color: var(--checkbox-default-bg);
+}
+
+.task-drag::before {
+    top: -0.5rem;
+}
+
+.task-drag::after {
+    top: 0.5rem;
 }
 
 .task-meta input[type=checkbox] {
