@@ -1,5 +1,33 @@
 (function () {
   /*========================
+    Service worker registration
+  ========================*/
+
+  const registerServiceWorker = async () => {
+    if ("serviceWorker" in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register(
+          "/worker.js",
+          {
+            scope: "/",
+          }
+        );
+        if (registration.installing) {
+          console.log("Service worker installing");
+        } else if (registration.waiting) {
+          console.log("Service worker installed");
+        } else if (registration.active) {
+          console.log("Service worker active");
+        }
+      } catch (error) {
+        console.error(`Registration failed with ${error}`);
+      }
+    }
+  };
+
+  registerServiceWorker();
+
+  /*========================
     Data & DOM References
   ========================*/
 
@@ -9,7 +37,7 @@
   let db;
   let latestPosition;
 
-  const DB_NAME = "tasks-app-db";
+  const DB_NAME = "task-manager-db";
   const DB_VERSION = 1;
   const DB_STORE_NAME = "tasks";
 
@@ -146,8 +174,8 @@
     taskItem.id = `task-item-${task.id}`;
     taskItem.innerHTML = `
       <div class="task-meta">
-        <div class="task-drag-container">
-            <div class="task-drag" id="task-${task.id}-drag"></div>
+        <div class="task-drag-container" id="task-${task.id}-drag">
+            <div class="task-drag"></div>
         </div>
         <input type="checkbox" class="status-toggle" 
                id="task-${task.id}-checkbox" ${
@@ -198,12 +226,14 @@
 
     // Find the drag handle and attach the event to it
     const dragHandle = taskItem.querySelector(`#task-${task.id}-drag`);
-    if (isDraggable) {
-      dragHandle.draggable = true;
-      dragHandle.addEventListener("dragstart", dragstartHandler);
-    } else {
-      const taskMeta = taskItem.querySelector(`.task-meta`);
-      taskMeta.removeChild(dragHandle);
+    if (dragHandle) {
+      if (isDraggable) {
+        dragHandle.draggable = true;
+        dragHandle.addEventListener("dragstart", dragstartHandler);
+      } else {
+        const taskMeta = taskItem.querySelector(`.task-meta`);
+        taskMeta.removeChild(dragHandle);
+      }
     }
     return taskItem;
   }
