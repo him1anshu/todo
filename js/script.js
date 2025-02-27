@@ -111,12 +111,120 @@
       redoStack = [];
     }
 
-    if (undoStack.length === 100) {
+    if (undoStack.length === 50) {
       undoStack.shift();
     }
 
     undoStack.push(taskEvent);
   }
+
+  function undoCreatedTask(taskEvent) {
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.delete(taskEvent.taskId);
+    request.addEventListener("success", (event) => {
+      document.getElementById(`task-item-${taskEvent.taskId}`)?.remove();
+      redoStack.push({
+        name: "task-deleted",
+        taskId: taskEvent.taskId,
+        data: taskEvent.data,
+      });
+    });
+  }
+
+  function undoUpdatedTask(taskEvent) {
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.put(taskEvent.prevData);
+    request.addEventListener("success", () => {
+      redoStack.push({
+        name: "task-updated",
+        taskId: taskEvent.taskId,
+        prevData: taskEvent.newData,
+        newData: taskEvent.prevData,
+      });
+    });
+  }
+
+  function undoDeletedTask(taskEvent) {
+    const objectStore = getObjectStore("tasks", "readwrite");
+    const request = objectStore.add(taskEvent.data);
+    request.addEventListener("success", () => {
+      const taskFilter = document.querySelector("#task-filter");
+      const sortBy = document.querySelector("#sort-by");
+      if (taskFilter.value !== "completed") {
+        if (sortBy.value) {
+          sortTasks(sortBy.value);
+        } else {
+          taskListContainer.appendChild(renderTask(taskEvent.data));
+        }
+      }
+
+      redoStack.push({
+        name: "task-created",
+        taskId: taskEvent.taskId,
+        data: taskEvent.data,
+      });
+    });
+  }
+
+  function undoReorderedTask(taskEvent) {
+    const objectStore = getObjectStore("tasks", "readwrite");
+    for (const taskItem of taskEvent.data) {
+      const { taskId, prevPos, newPos } = taskItem;
+      const taskReorderedData = [];
+      let counter = 1;
+
+      const request = objectStore.get(taskId);
+      request.addEventListener("success", (event) => {
+        const task = event.target.result;
+        task.position = prevPos;
+
+        const updateRequest = objectStore.put(task);
+        updateRequest.addEventListener("success", () => {
+          counter++;
+          taskReorderedData.push({
+            taskId: task.id,
+            prevPos: newPos,
+            newPos: task.position,
+          });
+
+          if (taskEvent.data.length === counter) {
+            redoStack.push({
+              name: "task-reordered",
+              data: taskReorderedData,
+            });
+          }
+        });
+      });
+    }
+  }
+
+  function undoLatestTaskEvent() {
+    console.log(undoStack);
+    const event = undoStack.pop();
+    if (!event) {
+      console.log("Nothing to undo");
+      return;
+    }
+
+    switch (event.name) {
+      case "task-created":
+        undoCreatedTask(event);
+        break;
+      case "task-updated":
+        undoUpdatedTask(event);
+        break;
+      case "task-deleted":
+        undoDeletedTask(event);
+        break;
+      case "task-reordered":
+        undoReorderedTask(event);
+        break;
+      default:
+        console.log("Undo not supported for this event type");
+    }
+  }
+
+  function redoLatestTaskEvent() {}
 
   /*========================
     Drag & Drop Handlers
@@ -165,23 +273,31 @@
 
   function updateTaskOrder() {
     const objectStore = getObjectStore("tasks", "readwrite");
-    const taskLists = [...taskListContainer.children];
+    const tasksList = [...taskListContainer.children];
     let counter = 1;
-    for (const taskItem of taskLists) {
+    for (const taskItem of tasksList) {
       const [, taskId] = taskItem.id.split("task-item-");
+      const taskReorderedData = [];
+
       const request = objectStore.get(taskId);
       request.addEventListener("success", (event) => {
         const task = event.target.result;
         task.position = counter++;
 
         const updateRequest = objectStore.put(task);
-        updateRequest.addEventListener("success", (updateEvent) => {
-          pushDataToStack({
-            event: "task-reordered",
+        updateRequest.addEventListener("success", () => {
+          taskReorderedData.push({
             taskId: task.id,
             prevPos: event.target.result.position,
             newPos: task.position,
           });
+
+          if (tasksList.length === counter) {
+            pushDataToStack({
+              name: "task-reordered",
+              data: taskReorderedData,
+            });
+          }
         });
       });
     }
@@ -437,7 +553,7 @@
         document.getElementById("task-create-dialog").close();
 
         pushDataToStack({
-          event: "task-created",
+          name: "task-created",
           taskId: newTask.id,
           data: newTask,
         });
@@ -448,16 +564,21 @@
     const taskId = document.getElementById("task-delete-dialog").dataset.taskId;
 
     const objectStore = getObjectStore("tasks", "readwrite");
-    const request = objectStore.delete(taskId);
-    request.addEventListener("success", (event) => {
-      pushDataToStack({
-        event: "task-deleted",
-        taskId,
+    const getRequest = objectStore.get(taskId);
+    getRequest.addEventListener("success", (event) => {
+      const task = event.target.result;
+
+      const request = objectStore.delete(taskId);
+      request.addEventListener("success", () => {
+        pushDataToStack({
+          name: "task-deleted",
+          taskId,
+          data: task,
+        });
+        document.getElementById(`task-item-${taskId}`)?.remove();
+        document.getElementById("task-delete-dialog").close();
       });
     });
-
-    document.getElementById(`task-item-${taskId}`)?.remove();
-    document.getElementById("task-delete-dialog").close();
   });
 
   document.getElementById("task-edit-cancel")?.addEventListener("click", () => {
@@ -505,7 +626,7 @@
           document.getElementById("task-edit-dialog").close();
 
           pushDataToStack({
-            event: "task-updated",
+            name: "task-updated",
             taskId: task.id,
             prevData: event.target.result,
             newData: task,
@@ -654,6 +775,21 @@
     }
   });
 
+  document.addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.key.toLocaleLowerCase() === "z") {
+      undoLatestTaskEvent();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.key.toLocaleLowerCase() === "y") {
+      redoLatestTaskEvent();
+    }
+  });
+
+  /*========================
+    Date picker theme change
+  ========================*/
   const datePickerStyle = document.createElement("style");
   document.head.appendChild(datePickerStyle);
 
