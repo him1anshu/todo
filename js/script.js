@@ -30,7 +30,6 @@
   /*========================
     Data & DOM References
   ========================*/
-
   const taskListContainer = document.getElementById("task-list");
 
   let tasks = [];
@@ -102,6 +101,24 @@
   }
 
   /*========================
+    Undo & Redo
+  ========================*/
+  const undoStack = [];
+  let redoStack = [];
+
+  function pushDataToStack(taskEvent, clearRedoStack = true) {
+    if (clearRedoStack) {
+      redoStack = [];
+    }
+
+    if (undoStack.length === 100) {
+      undoStack.shift();
+    }
+
+    undoStack.push(taskEvent);
+  }
+
+  /*========================
     Drag & Drop Handlers
   ========================*/
   let draggedTaskId = null;
@@ -159,7 +176,12 @@
 
         const updateRequest = objectStore.put(task);
         updateRequest.addEventListener("success", (updateEvent) => {
-          console.log("success");
+          pushDataToStack({
+            event: "task-reordered",
+            taskId: task.id,
+            prevPos: event.target.result.position,
+            newPos: task.position,
+          });
         });
       });
     }
@@ -374,11 +396,13 @@
   document
     .getElementById("task-add-btn")
     .addEventListener("click", showCreateTaskModal);
+
   document
     .getElementById("task-create-cancel")
     .addEventListener("click", () => {
       document.getElementById("task-create-dialog").close();
     });
+
   document
     .getElementById("task-create-form")
     .addEventListener("submit", (event) => {
@@ -399,22 +423,37 @@
       const objectStore = getObjectStore("tasks", "readwrite");
       const request = objectStore.add(newTask);
       request.addEventListener("success", (dbEvent) => {
-        console.log("New task added successfully!!");
-        taskListContainer.appendChild(renderTask(newTask));
+        const taskFilter = document.querySelector("#task-filter");
+        const sortBy = document.querySelector("#sort-by");
+        if (taskFilter.value !== "completed") {
+          if (sortBy.value) {
+            sortTasks(sortBy.value);
+          } else {
+            taskListContainer.appendChild(renderTask(newTask));
+          }
+        }
+
         event.target.reset();
         document.getElementById("task-create-dialog").close();
+
+        pushDataToStack({
+          event: "task-created",
+          taskId: newTask.id,
+          data: newTask,
+        });
       });
     });
 
   document.getElementById("task-delete-form").addEventListener("submit", () => {
     const taskId = document.getElementById("task-delete-dialog").dataset.taskId;
-    // tasks = tasks.filter((task) => task.id !== taskId);
-    // localStorage.setItem("tasks", JSON.stringify(tasks));
 
     const objectStore = getObjectStore("tasks", "readwrite");
     const request = objectStore.delete(taskId);
     request.addEventListener("success", (event) => {
-      console.log(`Task deleted.`);
+      pushDataToStack({
+        event: "task-deleted",
+        taskId,
+      });
     });
 
     document.getElementById(`task-item-${taskId}`)?.remove();
@@ -449,12 +488,28 @@
         task.updatedAt = new Date().toISOString();
 
         const requestUpdate = objectStore.put(task);
-        requestUpdate.addEventListener("success", (event) => {
+        requestUpdate.addEventListener("success", (updateEvent) => {
           const taskItem = document.getElementById(`task-item-${taskId}`);
           if (taskItem) {
-            taskListContainer.replaceChild(renderTask(task), taskItem);
+            const sortBy = document.querySelector("#sort-by");
+            let isDraggable = true;
+            if (sortBy.value) {
+              isDraggable = false;
+            }
+
+            taskListContainer.replaceChild(
+              renderTask(task, isDraggable),
+              taskItem
+            );
           }
           document.getElementById("task-edit-dialog").close();
+
+          pushDataToStack({
+            event: "task-updated",
+            taskId: task.id,
+            prevData: event.target.result,
+            newData: task,
+          });
         });
       });
     });
@@ -505,7 +560,7 @@
     });
   });
 
-  document.getElementById("sort-by").addEventListener("change", (event) => {
+  function sortTasks(sortBy) {
     const isTaskFilterApplied = document.getElementById("task-filter").value;
     const tasksToBeSorted = [];
 
@@ -524,7 +579,6 @@
         }
         cursor.continue();
       } else {
-        const sortBy = event.target.value;
         if (sortBy === "due_date") {
           tasksToBeSorted.sort(
             (a, b) => new Date(a["due-date"]) - new Date(b["due-date"])
@@ -540,7 +594,11 @@
         );
       }
     });
-  });
+  }
+
+  document
+    .getElementById("sort-by")
+    .addEventListener("change", (event) => sortTasks(event.target.value));
 
   document
     .querySelector("#task-search input")
