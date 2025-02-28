@@ -1,5 +1,3 @@
-import { dragstartHandler } from "./drag-drop";
-
 export function getPriorityName(priorityValue) {
   const priorities = { 1: "high", 2: "medium", 3: "low" };
   return priorities[priorityValue] || "low";
@@ -11,7 +9,7 @@ export const formatDateTime = (dateString) =>
     timeStyle: "short",
   });
 
-export function renderTask(task, isDraggable = true) {
+export function renderTask(task) {
   const taskItem = document.createElement("div");
   taskItem.className = "task-item";
   taskItem.id = `task-item-${task.id}`;
@@ -67,16 +65,5 @@ export function renderTask(task, isDraggable = true) {
     taskItem.querySelector(".edit-btn").disabled = true;
   }
 
-  // Find the drag handle and attach the event to it
-  const dragHandle = taskItem.querySelector(`#task-${task.id}-drag`);
-  if (dragHandle) {
-    if (isDraggable) {
-      dragHandle.draggable = true;
-      dragHandle.addEventListener("dragstart", dragstartHandler);
-    } else {
-      const taskMeta = taskItem.querySelector(`.task-meta`);
-      taskMeta.removeChild(dragHandle);
-    }
-  }
   return taskItem;
 }

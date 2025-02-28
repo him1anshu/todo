@@ -1,6 +1,3 @@
-import { getObjectStore } from "./db.js";
-import { pushDataToStack } from "./undo-redo.js";
-
 let draggedTaskId = null;
 
 export function dragstartHandler(event) {

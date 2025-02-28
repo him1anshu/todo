@@ -1,6 +1,6 @@
-import { getObjectStore, renderAllTasks } from "./db";
-import { renderTask } from "./ui";
-import { sortTasks } from "./filter-sort-search";
+// import { renderTask } from "./ui.js";
+// import { sortTasks } from "./task-manager.js";
+// import { getObjectStore, renderAllTasks } from "./db.js";
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -137,18 +137,18 @@ export function undoLatestTaskEvent() {
   }
 
   switch (event.name) {
-    case "task-created":
-      removeTask(event, false);
-      break;
-    case "task-updated":
-      updateTask(event, false);
-      break;
-    case "task-deleted":
-      createTask(event, false);
-      break;
-    case "task-reordered":
-      reorderTask(event, false);
-      break;
+    // case "task-created":
+    //   removeTask(event, false);
+    //   break;
+    // case "task-updated":
+    //   updateTask(event, false);
+    //   break;
+    // case "task-deleted":
+    //   createTask(event, false);
+    //   break;
+    // case "task-reordered":
+    //   reorderTask(event, false);
+    //   break;
     default:
       console.log("Undo not supported for this event type");
   }
@@ -162,18 +162,18 @@ export function redoLatestTaskEvent() {
   }
 
   switch (event.name) {
-    case "task-created":
-      removeTask(event);
-      break;
-    case "task-updated":
-      updateTask(event);
-      break;
-    case "task-deleted":
-      createTask(event);
-      break;
-    case "task-reordered":
-      reorderTask(event);
-      break;
+    //   case "task-created":
+    //     removeTask(event);
+    //     break;
+    //   case "task-updated":
+    //     updateTask(event);
+    //     break;
+    //   case "task-deleted":
+    //     createTask(event);
+    //     break;
+    //   case "task-reordered":
+    //     reorderTask(event);
+    //     break;
     default:
       console.log("Redo not supported for this event type");
   }

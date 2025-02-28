@@ -1,7 +1,5 @@
-const datePickerStyle = document.createElement("style");
-document.head.appendChild(datePickerStyle);
-
 export function updateDatePickerTheme() {
+  const datePickerStyle = document.querySelector("style");
   const isDarkTheme =
     document.documentElement.getAttribute("data-theme") === "dark";
 
