@@ -84,7 +84,9 @@ import { renderTask } from "./ui.js";
 
   document
     .getElementById("clear-search-btn")
-    .addEventListener("click", clearFilters);
+    .addEventListener("click", async () => {
+      await clearFilters();
+    });
 
   taskListContainer.addEventListener("click", (event) => {
     const target = event.target.closest("[data-action]");
@@ -255,7 +257,7 @@ import { renderTask } from "./ui.js";
     try {
       db = await openDBConnection();
       console.log("Database connection established!");
-      latestPosition = renderAllTasks();
+      latestPosition = await renderAllTasks();
     } catch (error) {
       console.error("Error opening database:", error);
     }
@@ -272,9 +274,9 @@ import { renderTask } from "./ui.js";
     }
   });
 
-  document.addEventListener("keydown", (event) => {
+  document.addEventListener("keydown", async (event) => {
     if (event.altKey && event.key.toLocaleLowerCase() === "r") {
-      clearFilters();
+      await clearFilters();
     }
   });
 

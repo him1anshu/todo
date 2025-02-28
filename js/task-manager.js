@@ -1,4 +1,4 @@
-import { getObjectStore } from "./db.js";
+import { getObjectStore, getAllTasksByIndex } from "./db.js";
 import { renderTask, formatDateTime } from "./ui.js";
 import { updateDatePickerTheme } from "./date-picker-theme.js";
 import { dragstartHandler } from "./drag-drop.js";
@@ -18,38 +18,36 @@ export function attachDragHandlerToTaskItem(id, taskItem, isDraggable = true) {
   }
 }
 
-export function renderAllTasks() {
-  return new Promise((resolve, reject) => {
+export async function renderAllTasks() {
+  try {
     let maxPositionValue = 0;
-    const objectStore = getObjectStore("tasks", "readonly");
-    const index = objectStore.index("position");
-    const request = index.openCursor();
-    request.addEventListener("success", (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
-        maxPositionValue =
-          maxPositionValue < cursor.value.position
-            ? cursor.value.position
-            : maxPositionValue;
-        const taskItem = renderTask(cursor.value);
-        attachDragHandlerToTaskItem(cursor.value.id, taskItem);
-        taskListContainer.appendChild(taskItem);
-        cursor.continue();
-      } else {
-        resolve(maxPositionValue);
-      }
+    const tasks = await getAllTasksByIndex("tasks", "readonly", "position");
+    tasks.forEach((task) => {
+      maxPositionValue =
+        maxPositionValue < task.position ? task.position : maxPositionValue;
+      const taskItem = renderTask(task);
+      attachDragHandlerToTaskItem(task.id, taskItem);
+      taskListContainer.appendChild(taskItem);
     });
-  });
+
+    return maxPositionValue;
+  } catch (error) {
+    throw error;
+  }
 }
 
-export function clearFilters() {
-  document.getElementById("task-filter").value = "";
-  document.getElementById("sort-by").value = "";
-  document.querySelector("#task-search input").value = "";
+export async function clearFilters() {
+  try {
+    document.getElementById("task-filter").value = "";
+    document.getElementById("sort-by").value = "";
+    document.querySelector("#task-search input").value = "";
 
-  taskListContainer.innerHTML = "";
+    taskListContainer.innerHTML = "";
 
-  renderAllTasks();
+    await renderAllTasks();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export function sortTasks(sortBy) {

@@ -41,3 +41,95 @@ export function openDBConnection() {
     });
   });
 }
+
+export function getAllTasks(db, mode) {
+  return new Promise((resolve, reject) => {
+    const objectStore = getObjectStore(db, mode);
+    const request = objectStore.getAll();
+    request.addEventListener("success", () => {
+      resolve(request.result);
+    });
+
+    request.addEventListener("error", () => {
+      reject(request.error);
+    });
+  });
+}
+
+export function getAllTasksByIndex(db, mode, indexName) {
+  const tasks = [];
+  return new Promise((resolve, reject) => {
+    const objectStore = getObjectStore(db, mode);
+    const index = objectStore.index(indexName);
+    const request = index.openCursor();
+    request.addEventListener("success", () => {
+      const cursor = request.result;
+      if (cursor) {
+        tasks.push(cursor.value);
+        cursor.continue();
+      } else {
+        resolve(tasks);
+      }
+    });
+
+    request.addEventListener("error", () => {
+      reject(error);
+    });
+  });
+}
+
+export function getTask(db, mode, key) {
+  return new Promise((resolve, reject) => {
+    const objectStore = getObjectStore(db, mode);
+    const request = objectStore.get(key);
+    request.addEventListener("success", () => {
+      resolve(request.result);
+    });
+
+    request.addEventListener("error", () => {
+      reject(request.error);
+    });
+  });
+}
+
+export function addTask(db, mode, data) {
+  return new Promise((resolve, reject) => {
+    const objectStore = getObjectStore(db, mode);
+    const request = objectStore.add(data);
+    request.addEventListener("success", () => {
+      resolve(request.result);
+    });
+
+    request.addEventListener("error", () => {
+      reject(request.error);
+    });
+  });
+}
+
+export function deleteTask(db, mode, key) {
+  return new Promise((resolve, reject) => {
+    const objectStore = getObjectStore(db, mode);
+    const request = objectStore.delete(key);
+    request.addEventListener("success", () => {
+      resolve("Deleted");
+    });
+
+    request.addEventListener("error", () => {
+      reject(request.error);
+    });
+  });
+}
+
+export function putTask(db, mode, data) {
+  return new Promise((resolve, reject) => {
+    const objectStore = getObjectStore(db, mode);
+    const request = objectStore.put(data);
+    request.addEventListener("success", () => {
+      resolve(request.result);
+    });
+
+    request.addEventListener("error", () => {
+      reject(request.error);
+    });
+  });
+}

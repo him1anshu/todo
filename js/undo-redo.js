@@ -97,7 +97,7 @@ function reorderTask(taskEvent, isRedoEvent = true) {
   for (const taskItem of taskEvent.data) {
     const { taskId, prevPos, newPos } = taskItem;
     const request = objectStore.get(taskId);
-    request.addEventListener("success", (event) => {
+    request.addEventListener("success", async (event) => {
       const task = { ...event.target.result };
       task.position = prevPos;
 
@@ -120,7 +120,7 @@ function reorderTask(taskEvent, isRedoEvent = true) {
           });
         }
 
-        renderAllTasks();
+        await renderAllTasks();
       }
 
       const updateRequest = objectStore.put(task);
