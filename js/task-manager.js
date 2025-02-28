@@ -1,4 +1,10 @@
-import { getObjectStore, getAllTasksByIndex } from "./db.js";
+import {
+  getObjectStore,
+  getAllTasksByIndex,
+  getAllTasks,
+  getTask,
+  putTask,
+} from "./db.js";
 import { renderTask, formatDateTime } from "./ui.js";
 import { updateDatePickerTheme } from "./date-picker-theme.js";
 import { dragstartHandler } from "./drag-drop.js";
@@ -50,100 +56,75 @@ export async function clearFilters() {
   }
 }
 
-export function sortTasks(sortBy) {
-  const isTaskFilterApplied = document.getElementById("task-filter").value;
-  const tasksToBeSorted = [];
-
-  const objectStore = getObjectStore("tasks", "readonly");
-  const request = objectStore.openCursor();
-  request.addEventListener("success", (idbEvent) => {
-    const cursor = idbEvent.target.result;
-    if (cursor) {
-      const task = cursor.value;
-      if (isTaskFilterApplied) {
-        if (task.status === isTaskFilterApplied) {
-          tasksToBeSorted.push(task);
-        }
-      } else {
-        tasksToBeSorted.push(task);
-      }
-      cursor.continue();
-    } else {
-      if (sortBy === "due_date") {
-        tasksToBeSorted.sort(
-          (a, b) => new Date(a["due-date"]) - new Date(b["due-date"])
-        );
-      } else if (sortBy === "priority") {
-        tasksToBeSorted.sort((a, b) => a.priority - b.priority);
-      }
-
-      taskListContainer.innerHTML = "";
-
-      tasksToBeSorted.forEach((task) => {
-        const taskItem = renderTask(task);
-        attachDragHandlerToTaskItem(task.id, taskItem, false);
-        taskListContainer.appendChild(taskItem);
-      });
+export async function sortTasks(sortBy) {
+  try {
+    const tasks = await getAllTasks("tasks", "readonly");
+    const taskFilterValue = document.getElementById("task-filter").value;
+    if (taskFilterValue) {
+      tasks = tasks.filter((task) => task.status === taskFilterValue);
     }
-  });
-}
 
-export function toggleTaskCompletion(taskId, isChecked) {
-  const newStatus = isChecked ? "completed" : "pending";
-  // tasks = tasks.map((task) =>
-  //   task.id === taskId
-  //     ? { ...task, status: newStatus, updatedAt: new Date().toISOString() }
-  //     : task
-  // );
-  // localStorage.setItem("tasks", JSON.stringify(tasks));
-  const objectStore = getObjectStore("tasks", "readwrite");
-  const request = objectStore.get(taskId);
-  request.addEventListener("success", (event) => {
-    const task = event.target.result;
-    task.status = newStatus;
+    if (sortBy === "due_date") {
+      tasks.sort((a, b) => new Date(a["due-date"]) - new Date(b["due-date"]));
+    } else if (sortBy === "priority") {
+      tasks.sort((a, b) => a.priority - b.priority);
+    }
 
-    const requestUpdate = objectStore.put(task);
-    requestUpdate.addEventListener("success", (event) => {
-      console.log(`Task updated with status: ${newStatus}.`);
+    taskListContainer.innerHTML = "";
+
+    tasks.forEach((task) => {
+      const taskItem = renderTask(task);
+      attachDragHandlerToTaskItem(task.id, taskItem, false);
+      taskListContainer.appendChild(taskItem);
     });
-  });
-
-  const taskItem = document.getElementById(`task-item-${taskId}`);
-  const currentFilter = document.getElementById("task-filter").value;
-  if (currentFilter && currentFilter !== newStatus) {
-    taskItem && taskItem.remove();
-  } else if (taskItem) {
-    const statusBadge = taskItem.querySelector(".status-badge");
-    const taskText = taskItem.querySelector(".task-title");
-    const editBtn = taskItem.querySelector(".edit-btn");
-
-    taskText.style.textDecoration = isChecked ? "line-through" : "none";
-    statusBadge.className = `status-badge status-${newStatus}`;
-    statusBadge.textContent = newStatus;
-    editBtn.disabled = isChecked;
+  } catch (error) {
+    console.log(error);
   }
 }
 
-export function deleteTask(taskId) {
-  const objectStore = getObjectStore("tasks", "readwrite");
-  const request = objectStore.get(taskId);
-  request.addEventListener("success", (event) => {
-    const task = event.target.result;
-    if (!task) return;
+export async function toggleTaskCompletion(taskId, isChecked) {
+  try {
+    const newStatus = isChecked ? "completed" : "pending";
 
+    const task = await getTask("tasks", "readonly", taskId);
+    task.status = newStatus;
+
+    await putTask("tasks", "readwrite", task);
+
+    const taskItem = document.getElementById(`task-item-${taskId}`);
+    const currentFilter = document.getElementById("task-filter").value;
+    if (currentFilter && currentFilter !== newStatus) {
+      taskItem && taskItem.remove();
+    } else if (taskItem) {
+      const statusBadge = taskItem.querySelector(".status-badge");
+      const taskText = taskItem.querySelector(".task-title");
+      const editBtn = taskItem.querySelector(".edit-btn");
+
+      taskText.style.textDecoration = isChecked ? "line-through" : "none";
+      statusBadge.className = `status-badge status-${newStatus}`;
+      statusBadge.textContent = newStatus;
+      editBtn.disabled = isChecked;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function removeTask(taskId) {
+  try {
+    const task = await getTask("tasks", "readonly", taskId);
     const taskDeleteDialog = document.getElementById("task-delete-dialog");
     document.getElementById("task-delete-display").value = task.display;
     taskDeleteDialog.dataset.taskId = taskId;
     taskDeleteDialog.showModal();
-  });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-export function viewTask(taskId) {
-  const objectStore = getObjectStore("tasks", "readwrite");
-  const request = objectStore.get(taskId);
-  request.addEventListener("success", (event) => {
-    const task = event.target.result;
-    if (!task) return;
+export async function viewTask(taskId) {
+  try {
+    const task = await getTask("tasks", "readonly", taskId);
 
     document.getElementById("task-view-display").value = task.display;
     document.getElementById("task-view-description").value = task.description;
@@ -156,15 +137,14 @@ export function viewTask(taskId) {
       task.updatedAt
     );
     document.getElementById("task-view-dialog").showModal();
-  });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-export function editTask(taskId) {
-  const objectStore = getObjectStore("tasks", "readwrite");
-  const request = objectStore.get(taskId);
-  request.addEventListener("success", (event) => {
-    const task = event.target.result;
-    if (!task) return;
+export async function editTask(taskId) {
+  try {
+    const task = await getTask("tasks", "readonly", taskId);
 
     const editForm = document.getElementById("task-edit-form");
     editForm.elements["display"].value = task.display;
@@ -179,7 +159,9 @@ export function editTask(taskId) {
       .slice(0, 16);
     editForm.dataset.taskId = taskId;
     document.getElementById("task-edit-dialog").showModal();
-  });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 /*========================

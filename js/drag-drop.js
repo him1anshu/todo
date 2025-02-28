@@ -1,4 +1,6 @@
+import { getTask } from "./db.js";
 let draggedTaskId = null;
+const taskListContainer = document.getElementById("task-list");
 
 export function dragstartHandler(event) {
   const taskItem = event.target.closest(".task-item");
@@ -30,33 +32,33 @@ export function dragoverHandler(event) {
   }
 }
 
-export function dropHandler(event) {
+export async function dropHandler(event) {
   event.preventDefault();
   const draggedElement = document.getElementById(draggedTaskId);
   if (draggedElement) {
     draggedElement.classList.remove("dragging");
   }
   draggedTaskId = null;
-  updateTaskOrder();
+  await updateTaskOrder();
 }
 
-function updateTaskOrder() {
-  const objectStore = getObjectStore("tasks", "readwrite");
-
+async function updateTaskOrder() {
   let counter = 1;
   const taskReorderedData = [];
   const tasksList = [...taskListContainer.children];
-  for (const taskItem of tasksList) {
-    const [, taskId] = taskItem.id.split("task-item-");
 
-    const request = objectStore.get(taskId);
-    request.addEventListener("success", (event) => {
-      const task = { ...event.target.result };
+  try {
+    for (const taskItem of tasksList) {
+      const [, taskId] = taskItem.id.split("task-item-");
+
+      const taskData = await getTask("tasks", "readonly", taskId);
+
+      const task = { ...taskData };
       task.position = counter++;
 
       taskReorderedData.push({
         taskId: task.id,
-        prevPos: event.target.result.position,
+        prevPos: taskData.position,
         newPos: task.position,
       });
 
@@ -67,8 +69,9 @@ function updateTaskOrder() {
         });
       }
 
-      const updateRequest = objectStore.put(task);
-      updateRequest.addEventListener("success", () => {});
-    });
+      await getTask("tasks", "readonly", task);
+    }
+  } catch (error) {
+    console.log(error);
   }
 }

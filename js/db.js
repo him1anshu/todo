@@ -27,6 +27,7 @@ export function openDBConnection() {
       objectStore.createIndex("id", "id", { unique: true });
       objectStore.createIndex("display", "display", { unique: false });
       objectStore.createIndex("position", "position", { unique: false });
+      objectStore.createIndex("status", "status", { unique: false });
     });
 
     request.addEventListener("success", (event) => {
@@ -56,20 +57,13 @@ export function getAllTasks(db, mode) {
   });
 }
 
-export function getAllTasksByIndex(db, mode, indexName) {
-  const tasks = [];
+export function getAllTasksByIndex(db, mode, indexName, range = null) {
   return new Promise((resolve, reject) => {
     const objectStore = getObjectStore(db, mode);
     const index = objectStore.index(indexName);
-    const request = index.openCursor();
+    const request = index.getAll();
     request.addEventListener("success", () => {
-      const cursor = request.result;
-      if (cursor) {
-        tasks.push(cursor.value);
-        cursor.continue();
-      } else {
-        resolve(tasks);
-      }
+      resolve(request.result);
     });
 
     request.addEventListener("error", () => {

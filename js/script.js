@@ -1,4 +1,12 @@
-import { openDBConnection, getObjectStore } from "./db.js";
+import {
+  openDBConnection,
+  getAllTasksByIndex,
+  getAllTasks,
+  addTask,
+  putTask,
+  getTask,
+  deleteTask,
+} from "./db.js";
 import { registerServiceWorker } from "./serviceWorkerRegistration.js";
 import { dragoverHandler, dropHandler } from "./drag-drop.js";
 import {
@@ -7,7 +15,7 @@ import {
   clearFilters,
   sortTasks,
   toggleTaskCompletion,
-  deleteTask,
+  removeTask,
   viewTask,
   editTask,
   showCreateTaskModal,
@@ -36,50 +44,52 @@ import { renderTask } from "./ui.js";
     Taks Action
   ========================*/
 
-  document.getElementById("task-filter").addEventListener("change", (event) => {
-    const status = event.target.value;
-    taskListContainer.innerHTML = "";
+  document
+    .getElementById("task-filter")
+    .addEventListener("change", async (event) => {
+      try {
+        const status = event.target.value;
+        taskListContainer.innerHTML = "";
 
-    const objectStore = getObjectStore("tasks", "readonly");
-    const request = objectStore.openCursor();
-    request.addEventListener("success", (idbEvent) => {
-      const cursor = idbEvent.target.result;
-      if (cursor) {
-        const task = cursor.value;
-        if (task.status === status) {
+        let tasks = await getAllTasksByIndex("tasks", "readonly", "status");
+
+        tasks = tasks.filter((task) => task.status === status);
+
+        tasks.forEach((task) => {
           const taskItem = renderTask(task);
           attachDragHandlerToTaskItem(task.id, taskItem, false);
           taskListContainer.appendChild(taskItem);
-        }
-        cursor.continue();
+        });
+      } catch (error) {
+        console.log(error);
       }
     });
-  });
 
   document
     .getElementById("sort-by")
-    .addEventListener("change", (event) => sortTasks(event.target.value));
+    .addEventListener(
+      "change",
+      async (event) => await sortTasks(event.target.value)
+    );
 
   document
     .querySelector("#task-search input")
-    .addEventListener("input", (event) => {
-      const searchTerm = event.target.value.toLowerCase();
-      taskListContainer.innerHTML = "";
+    .addEventListener("input", async (event) => {
+      try {
+        const searchTerm = event.target.value.toLowerCase();
+        taskListContainer.innerHTML = "";
 
-      const objectStore = getObjectStore("tasks", "readonly");
-      const request = objectStore.openCursor();
-      request.addEventListener("success", (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          const task = cursor.value;
+        const tasks = await getAllTasks("tasks", "readonly");
+        tasks.forEach((task) => {
           if (task.display.toLowerCase().includes(searchTerm)) {
-            const taskItem = renderTask(cursor.value);
+            const taskItem = renderTask(task);
             attachDragHandlerToTaskItem(task.id, taskItem, false);
             taskListContainer.appendChild(taskItem);
           }
-          cursor.continue();
-        }
-      });
+        });
+      } catch (error) {
+        console.log(error);
+      }
     });
 
   document
@@ -88,23 +98,23 @@ import { renderTask } from "./ui.js";
       await clearFilters();
     });
 
-  taskListContainer.addEventListener("click", (event) => {
+  taskListContainer.addEventListener("click", async (event) => {
     const target = event.target.closest("[data-action]");
     if (!target) return;
     const action = target.dataset.action;
     const taskId = target.dataset.taskId;
     switch (action) {
       case "checkbox":
-        toggleTaskCompletion(taskId, target.checked);
+        await toggleTaskCompletion(taskId, target.checked);
         break;
       case "delete":
-        deleteTask(taskId);
+        await removeTask(taskId);
         break;
       case "view":
-        viewTask(taskId);
+        await viewTask(taskId);
         break;
       case "edit":
-        editTask(taskId);
+        await editTask(taskId);
         break;
     }
   });
@@ -124,7 +134,7 @@ import { renderTask } from "./ui.js";
 
   document
     .getElementById("task-create-form")
-    .addEventListener("submit", (event) => {
+    .addEventListener("submit", async (event) => {
       event.preventDefault();
       const formData = new FormData(event.target);
       const newTask = {
@@ -139,14 +149,14 @@ import { renderTask } from "./ui.js";
         updatedAt: new Date().toISOString(),
       };
 
-      const objectStore = getObjectStore("tasks", "readwrite");
-      const request = objectStore.add(newTask);
-      request.addEventListener("success", (dbEvent) => {
+      try {
+        await addTask("tasks", "readwrite", newTask);
+
         const taskFilter = document.querySelector("#task-filter");
         const sortBy = document.querySelector("#sort-by");
         if (taskFilter.value !== "completed") {
           if (sortBy.value) {
-            sortTasks(sortBy.value);
+            await sortTasks(sortBy.value);
           } else {
             const taskItem = renderTask(newTask);
             attachDragHandlerToTaskItem(newTask.id, taskItem);
@@ -162,29 +172,33 @@ import { renderTask } from "./ui.js";
           taskId: newTask.id,
           data: newTask,
         });
-      });
+      } catch (error) {
+        console.log(error);
+      }
     });
 
-  document.getElementById("task-delete-form").addEventListener("submit", () => {
-    const taskId = document.getElementById("task-delete-dialog").dataset.taskId;
+  document
+    .getElementById("task-delete-form")
+    .addEventListener("submit", async () => {
+      try {
+        const taskId =
+          document.getElementById("task-delete-dialog").dataset.taskId;
 
-    const objectStore = getObjectStore("tasks", "readwrite");
-    const getRequest = objectStore.get(taskId);
-    getRequest.addEventListener("success", (event) => {
-      const task = event.target.result;
+        const task = await getTask("tasks", "readonly", taskId);
+        await deleteTask("tasks", "readwrite", taskId);
 
-      const request = objectStore.delete(taskId);
-      request.addEventListener("success", () => {
         pushDataToStack({
           name: "task-deleted",
           taskId,
           data: task,
         });
+
         document.getElementById(`task-item-${taskId}`)?.remove();
         document.getElementById("task-delete-dialog").close();
-      });
+      } catch (error) {
+        console.log(error);
+      }
     });
-  });
 
   document.getElementById("task-edit-cancel")?.addEventListener("click", () => {
     document.getElementById("task-edit-dialog").close();
@@ -197,15 +211,13 @@ import { renderTask } from "./ui.js";
 
   document
     .getElementById("task-edit-form")
-    .addEventListener("submit", (event) => {
+    .addEventListener("submit", async (event) => {
       event.preventDefault();
       const taskId = event.target.dataset.taskId;
       const formData = new FormData(event.target);
 
-      const objectStore = getObjectStore("tasks", "readwrite");
-      const request = objectStore.get(taskId);
-      request.addEventListener("success", (event) => {
-        const task = { ...event.target.result };
+      try {
+        const task = await getTask("tasks", "readonly", taskId);
 
         task.display = formData.get("display");
         task.description = formData.get("description");
@@ -213,30 +225,31 @@ import { renderTask } from "./ui.js";
         task.priority = parseInt(formData.get("priority"), 10);
         task.updatedAt = new Date().toISOString();
 
-        const requestUpdate = objectStore.put(task);
-        requestUpdate.addEventListener("success", (updateEvent) => {
-          const taskItem = document.getElementById(`task-item-${taskId}`);
-          if (taskItem) {
-            const sortBy = document.querySelector("#sort-by");
-            let isDraggable = true;
-            if (sortBy.value) {
-              isDraggable = false;
-            }
+        await putTask("tasks", "readwrite", task);
 
-            const newTaskItem = renderTask(task);
-            attachDragHandlerToTaskItem(task.id, newTaskItem, isDraggable);
-            taskListContainer.replaceChild(newTaskItem, taskItem);
+        const taskItem = document.getElementById(`task-item-${taskId}`);
+        if (taskItem) {
+          const sortBy = document.querySelector("#sort-by");
+          let isDraggable = true;
+          if (sortBy.value) {
+            isDraggable = false;
           }
-          document.getElementById("task-edit-dialog").close();
 
-          pushDataToStack({
-            name: "task-updated",
-            taskId: task.id,
-            prevData: event.target.result,
-            newData: task,
-          });
+          const newTaskItem = renderTask(task);
+          attachDragHandlerToTaskItem(task.id, newTaskItem, isDraggable);
+          taskListContainer.replaceChild(newTaskItem, taskItem);
+        }
+        document.getElementById("task-edit-dialog").close();
+
+        pushDataToStack({
+          name: "task-updated",
+          taskId: task.id,
+          prevData: event.target.result,
+          newData: task,
         });
-      });
+      } catch (error) {
+        console.log(error);
+      }
     });
 
   // Initial Render & Setup

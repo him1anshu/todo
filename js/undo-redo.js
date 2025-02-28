@@ -64,12 +64,12 @@ function updateTask(taskEvent, isRedoEvent = true) {
 function createTask(taskEvent, isRedoEvent = true) {
   const objectStore = getObjectStore("tasks", "readwrite");
   const request = objectStore.add(taskEvent.data);
-  request.addEventListener("success", () => {
+  request.addEventListener("success", async () => {
     const taskFilter = document.querySelector("#task-filter");
     const sortBy = document.querySelector("#sort-by");
     if (taskFilter.value !== "completed") {
       if (sortBy.value) {
-        sortTasks(sortBy.value);
+        await sortTasks(sortBy.value);
       } else {
         taskListContainer.appendChild(renderTask(taskEvent.data));
       }
