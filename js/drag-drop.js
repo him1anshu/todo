@@ -1,10 +1,7 @@
-import { getTask, putTask } from "./db.js";
 import { undoRedoManager } from "./undo-redo.js";
 import { ReorderTaskCommand } from "./commands.js";
-import { logMessage } from "./utility.js";
 
 let draggedTaskId = null;
-const taskListContainer = document.getElementById("task-list");
 
 export function dragstartHandler(event) {
   const taskItem = event.target.closest(".task-item");
@@ -38,44 +35,51 @@ export function dragoverHandler(event) {
 
 export async function dropHandler(event) {
   event.preventDefault();
+
+  if (!draggedTaskId) return;
+
   const draggedElement = document.getElementById(draggedTaskId);
   if (draggedElement) {
     draggedElement.classList.remove("dragging");
   }
+
+  const [, taskId] = draggedTaskId.split("task-item-");
+
+  await undoRedoManager.execute(new ReorderTaskCommand(taskId));
+
   draggedTaskId = null;
-  await updateTaskItemsOrder();
 }
 
-async function updateTaskItemsOrder() {
-  let counter = 1;
-  const taskReorderedData = [];
-  const tasksList = [...taskListContainer.children];
+// async function updateTaskItemsOrder() {
+//   let counter = 1;
+//   const taskReorderedData = [];
+//   const tasksList = [...taskListContainer.children];
 
-  try {
-    for (const taskItem of tasksList) {
-      const [, taskId] = taskItem.id.split("task-item-");
+//   try {
+//     for (const taskItem of tasksList) {
+//       const [, taskId] = taskItem.id.split("task-item-");
 
-      const taskData = await getTask("tasks", "readonly", taskId);
+//       const taskData = await getTask("tasks", "readonly", taskId);
 
-      const task = { ...taskData };
-      task.position = counter++;
+//       const task = { ...taskData };
+//       task.position = counter++;
 
-      taskReorderedData.push({
-        taskId: task.id,
-        prevPos: taskData.position,
-        newPos: task.position,
-      });
+//       taskReorderedData.push({
+//         taskId: task.id,
+//         prevPos: taskData.position,
+//         newPos: task.position,
+//       });
 
-      if (tasksList.length === counter - 1) {
-        // pushDataToStack({
-        //   name: "task-reordered",
-        //   data: taskReorderedData,
-        // });
-      }
+//       if (tasksList.length === counter - 1) {
+//         // pushDataToStack({
+//         //   name: "task-reordered",
+//         //   data: taskReorderedData,
+//         // });
+//       }
 
-      await putTask("tasks", "readwrite", task);
-    }
-  } catch (error) {
-    logMessage("error", "Error in updating tasks order", error);
-  }
-}
+//       await putTask("tasks", "readwrite", task);
+//     }
+//   } catch (error) {
+//     logMessage("error", "Error in updating tasks order", error);
+//   }
+// }

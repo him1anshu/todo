@@ -3,6 +3,7 @@ const URLS_TO_CACHE = [
   "/",
   "/index.html",
   "/css/styles.css",
+  "/js/commands.js",
   "/js/date-picker-theme.js",
   "/js/db.js",
   "/js/drag-drop.js",
