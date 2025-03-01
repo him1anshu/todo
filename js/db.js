@@ -1,3 +1,5 @@
+import { logMessage } from "./utility";
+
 const DB_NAME = "task-manager-db";
 const DB_VERSION = 1;
 const DB_STORE_NAME = "tasks";
@@ -17,7 +19,7 @@ export function openDBConnection() {
       db = event.target.result; // Assign db
 
       db.addEventListener("error", (event) => {
-        console.error(`Database error: ${event.target.error?.message}`);
+        logMessage("error", "Database error: ", event.target.error?.message);
       });
 
       const objectStore = db.createObjectStore(DB_STORE_NAME, {
@@ -36,7 +38,8 @@ export function openDBConnection() {
     });
 
     request.addEventListener("error", (event) => {
-      console.error(
+      logMessage(
+        "error",
         "Application not allowed to use IndexedDB for storage, please allow it."
       );
     });

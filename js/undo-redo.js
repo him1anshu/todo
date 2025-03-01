@@ -1,6 +1,7 @@
 // import { renderTask } from "./ui.js";
 // import { sortTasks } from "./task-manager.js";
 // import { getObjectStore, renderAllTasks } from "./db.js";
+import { logMessage } from "./utility";
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -8,7 +9,6 @@ const undoStack = [];
 let redoStack = [];
 
 export function pushDataToStack(taskEvent) {
-  console.log(taskEvent);
   redoStack = [];
 
   if (undoStack.length === 50) {
@@ -132,7 +132,7 @@ function reorderTask(taskEvent, isRedoEvent = true) {
 export function undoLatestTaskEvent() {
   const event = undoStack.pop();
   if (!event) {
-    console.log("Nothing to undo");
+    logMessage("log", "Nothing to undo");
     return;
   }
 
@@ -150,14 +150,14 @@ export function undoLatestTaskEvent() {
     //   reorderTask(event, false);
     //   break;
     default:
-      console.log("Undo not supported for this event type");
+      logMessage("error", "Undo not supported for this event type");
   }
 }
 
 export function redoLatestTaskEvent() {
   const event = redoStack.pop();
   if (!event) {
-    console.log("Nothing to redo");
+    logMessage("log", "Nothing to redo");
     return;
   }
 
@@ -175,6 +175,6 @@ export function redoLatestTaskEvent() {
     //     reorderTask(event);
     //     break;
     default:
-      console.log("Redo not supported for this event type");
+      logMessage("error", "Redo not supported for this event type");
   }
 }

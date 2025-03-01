@@ -282,12 +282,44 @@ footer p {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%23ffffff'/%3E%3C/svg%3E");
 }
 
+.task-completed .task-title {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.task-completed .edit-btn {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.task-completed .priority-high::after,
+.task-completed .priority-medium::after,
+.task-completed .priority-low::after {
+    content: "";
+    display: none;
+    animation: none;
+}
+
 .task-due-date:invalid {
     color: var(--duedate-invalid);
 }
 
 .task-due-date:valid {
     color: var(--duedate-valid);
+}
+
+.task-due-date::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+.task-due-date::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+.dark-theme .task-due-date::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }
 
 button {

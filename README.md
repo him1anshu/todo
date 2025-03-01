@@ -1,13 +1,15 @@
 # TODO APP
 
-## **Core Features**
+## Features
+
+### **Core Features**
 
 1. **Add, Edit, Delete Todos** – Basic CRUD operations.
 2. **Mark as Complete/Incomplete** – Toggle state handling.
 3. **Filter Todos (All, Completed, Pending)** – Dynamic UI updates.
 4. **Search Todos** – Implement real-time filtering.
 
-## **Intermediate Features**
+### **Intermediate Features**
 
 1. **Local Storage Persistence** – Learn how to store and retrieve data.
 2. **Due Dates & Priority Levels** – Work with dates and sorting logic.
@@ -15,7 +17,7 @@
 4. **Keyboard Shortcuts** – Improve accessibility with event listeners.
 5. **Animations & Transitions** – Use CSS and JS animations for smooth UI.
 
-## **Advanced Features**
+### **Advanced Features**
 
 1. **Dark Mode Toggle** – Work with themes using CSS variables.
 2. **Offline Support** – Use Service Workers or IndexedDB.
@@ -24,18 +26,17 @@
 5. **Notifications & Reminders** – Use the Notification API.
 6. **Progress Tracker** – Show completion percentage visually.
 
-## **Bonus Challenges**
+### **Bonus Challenges**
 
 1. **Voice Commands** – Add speech-to-text for task input.
 2. **PWA (Progressive Web App)** – Make the app installable.
 3. **Sync with a Backend (Optional)** – Use Fetch API to interact with an API.
 
-
-Below are some suggestions to optimize your code and improve the undo/redo functionality for reordering tasks:
-
 ---
 
-### General Code Optimization
+## Code Optimization
+
+### General
 
 - **Modularization & Separation of Concerns:**  
   • Break the code into smaller modules or files (e.g., one for IndexedDB operations, one for UI rendering, one for event handling, etc.).  
@@ -87,13 +88,7 @@ Below are some suggestions to optimize your code and improve the undo/redo funct
 
 ---
 
-By implementing these suggestions, you should see improvements in both performance and code maintainability while also streamlining the undo/redo logic—especially for complex operations like task reordering.
-
-
-
-
-
-This behavior is typically caused by how your service worker is caching and serving resources. Here are some suggestions to help resolve the issue:
+## Service Worker Issue
 
 ### 1. Cache Versioning & Busting
 
@@ -124,35 +119,9 @@ Make sure your activate event properly deletes old caches. This avoids conflicts
 • **Dev Tools Cache Disable:**  
 During development, you may want to disable caching via the browser’s developer tools to see changes immediately.
   
-By combining these approaches, you can reduce the need for multiple refreshes and ensure that updates to your JS file are promptly reflected on the client side.
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Making your task website SEO-friendly involves optimizing it for search engines like Google. Here’s a structured approach to improve its SEO
+## Improve SEO
 
 ### **1. Optimize Page Structure & Content**
 

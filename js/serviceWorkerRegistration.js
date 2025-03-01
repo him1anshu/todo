@@ -1,3 +1,5 @@
+import { logMessage } from "./utility";
+
 export const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {
     try {
@@ -8,14 +10,14 @@ export const registerServiceWorker = async () => {
         }
       );
       if (registration.installing) {
-        console.log("Service worker installing");
+        logMessage("log", "Service worker installing");
       } else if (registration.waiting) {
-        console.log("Service worker installed");
+        logMessage("log", "Service worker installed");
       } else if (registration.active) {
-        console.log("Service worker active");
+        logMessage("log", "Service worker active");
       }
     } catch (error) {
-      console.error(`Registration failed with ${error}`);
+      logMessage("error", "Registration failed with error: ", error);
     }
   }
 };

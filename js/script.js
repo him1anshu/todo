@@ -28,6 +28,7 @@ import {
   redoLatestTaskEvent,
 } from "./undo-redo.js";
 import { renderTask } from "./ui.js";
+import { logMessage } from "./utility";
 
 (function () {
   let db;
@@ -55,13 +56,16 @@ import { renderTask } from "./ui.js";
 
         tasks = tasks.filter((task) => task.status === status);
 
+        const fragment = document.createDocumentFragment();
         tasks.forEach((task) => {
           const taskItem = renderTask(task);
           attachDragHandlerToTaskItem(task.id, taskItem, false);
-          taskListContainer.appendChild(taskItem);
+          fragment.appendChild(taskItem);
         });
+
+        taskListContainer.appendChild(fragment);
       } catch (error) {
-        console.log(error);
+        logMessage("error", "Error: ", error);
       }
     });
 
@@ -79,16 +83,19 @@ import { renderTask } from "./ui.js";
         const searchTerm = event.target.value.toLowerCase();
         taskListContainer.innerHTML = "";
 
+        const fragment = document.createDocumentFragment();
         const tasks = await getAllTasks("tasks", "readonly");
         tasks.forEach((task) => {
           if (task.display.toLowerCase().includes(searchTerm)) {
             const taskItem = renderTask(task);
             attachDragHandlerToTaskItem(task.id, taskItem, false);
-            taskListContainer.appendChild(taskItem);
+            fragment.appendChild(taskItem);
           }
         });
+
+        taskListContainer.appendChild(fragment);
       } catch (error) {
-        console.log(error);
+        logMessage("error", "Error: ", error);
       }
     });
 
@@ -152,6 +159,8 @@ import { renderTask } from "./ui.js";
       try {
         await addTask("tasks", "readwrite", newTask);
 
+        const fragment = document.createDocumentFragment();
+
         const taskFilter = document.querySelector("#task-filter");
         const sortBy = document.querySelector("#sort-by");
         if (taskFilter.value !== "completed") {
@@ -160,9 +169,11 @@ import { renderTask } from "./ui.js";
           } else {
             const taskItem = renderTask(newTask);
             attachDragHandlerToTaskItem(newTask.id, taskItem);
-            taskListContainer.appendChild(taskItem);
+            fragment.appendChild(taskItem);
           }
         }
+
+        taskListContainer.appendChild(fragment);
 
         event.target.reset();
         document.getElementById("task-create-dialog").close();
@@ -173,7 +184,7 @@ import { renderTask } from "./ui.js";
           data: newTask,
         });
       } catch (error) {
-        console.log(error);
+        logMessage("error", "Error: ", error);
       }
     });
 
@@ -196,7 +207,7 @@ import { renderTask } from "./ui.js";
         document.getElementById(`task-item-${taskId}`)?.remove();
         document.getElementById("task-delete-dialog").close();
       } catch (error) {
-        console.log(error);
+        logMessage("error", "Error: ", error);
       }
     });
 
@@ -248,7 +259,7 @@ import { renderTask } from "./ui.js";
           newData: task,
         });
       } catch (error) {
-        console.log(error);
+        logMessage("error", "Error: ", error);
       }
     });
 
@@ -269,10 +280,11 @@ import { renderTask } from "./ui.js";
 
     try {
       db = await openDBConnection();
-      console.log("Database connection established!");
+      logMessage("log", "Database connection established!");
+
       latestPosition = await renderAllTasks();
     } catch (error) {
-      console.error("Error opening database:", error);
+      logMessage("error", "Error opening database:", error);
     }
   });
 
@@ -281,33 +293,31 @@ import { renderTask } from "./ui.js";
   toggleButton.addEventListener("click", toggleTheme);
 
   // Register key bindings
-  document.addEventListener("keydown", (event) => {
-    if (event.altKey && event.key.toLocaleLowerCase() === "n") {
-      showCreateTaskModal();
-    }
-  });
-
   document.addEventListener("keydown", async (event) => {
-    if (event.altKey && event.key.toLocaleLowerCase() === "r") {
-      await clearFilters();
-    }
-  });
+    if (event.altKey || event.ctrlKey) {
+      const key = event.key.toLowerCase();
 
-  document.addEventListener("keydown", (event) => {
-    if (event.altKey && event.key.toLocaleLowerCase() === "s") {
-      document.querySelector("#task-search input").focus();
-    }
-  });
+      switch (true) {
+        case event.altKey && key === "n":
+          showCreateTaskModal();
+          break;
 
-  document.addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.key.toLocaleLowerCase() === "z") {
-      undoLatestTaskEvent();
-    }
-  });
+        case event.altKey && key === "r":
+          await clearFilters();
+          break;
 
-  document.addEventListener("keydown", (event) => {
-    if (event.ctrlKey && event.key.toLocaleLowerCase() === "y") {
-      redoLatestTaskEvent();
+        case event.altKey && key === "s":
+          document.querySelector("#task-search input").focus();
+          break;
+
+        case event.ctrlKey && key === "z":
+          undoLatestTaskEvent();
+          break;
+
+        case event.ctrlKey && key === "y":
+          redoLatestTaskEvent();
+          break;
+      }
     }
   });
 })();

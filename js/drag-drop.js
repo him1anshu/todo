@@ -1,5 +1,6 @@
 import { getTask, putTask } from "./db.js";
 import { pushDataToStack } from "./undo-redo.js";
+import { logMessage } from "./utility";
 
 let draggedTaskId = null;
 const taskListContainer = document.getElementById("task-list");
@@ -41,10 +42,10 @@ export async function dropHandler(event) {
     draggedElement.classList.remove("dragging");
   }
   draggedTaskId = null;
-  await updateTaskOrder();
+  await updateTaskItemsOrder();
 }
 
-async function updateTaskOrder() {
+async function updateTaskItemsOrder() {
   let counter = 1;
   const taskReorderedData = [];
   const tasksList = [...taskListContainer.children];
@@ -74,6 +75,6 @@ async function updateTaskOrder() {
       await putTask("tasks", "readwrite", task);
     }
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error in updating tasks order", error);
   }
 }

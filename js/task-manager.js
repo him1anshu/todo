@@ -27,15 +27,18 @@ export function attachDragHandlerToTaskItem(id, taskItem, isDraggable = true) {
 export async function renderAllTasks() {
   try {
     let maxPositionValue = 0;
+
+    const fragment = document.createDocumentFragment();
     const tasks = await getAllTasksByIndex("tasks", "readonly", "position");
     tasks.forEach((task) => {
       maxPositionValue =
         maxPositionValue < task.position ? task.position : maxPositionValue;
       const taskItem = renderTask(task);
       attachDragHandlerToTaskItem(task.id, taskItem);
-      taskListContainer.appendChild(taskItem);
+      fragment.appendChild(taskItem);
     });
 
+    taskListContainer.appendChild(fragment);
     return maxPositionValue;
   } catch (error) {
     throw error;
@@ -52,7 +55,7 @@ export async function clearFilters() {
 
     await renderAllTasks();
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error: ", error);
   }
 }
 
@@ -71,14 +74,15 @@ export async function sortTasks(sortBy) {
     }
 
     taskListContainer.innerHTML = "";
-
+    const fragment = document.createDocumentFragment();
     tasks.forEach((task) => {
       const taskItem = renderTask(task);
       attachDragHandlerToTaskItem(task.id, taskItem, false);
-      taskListContainer.appendChild(taskItem);
+      fragment.appendChild(taskItem);
     });
+    taskListContainer.appendChild(fragment);
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error: ", error);
   }
 }
 
@@ -93,20 +97,22 @@ export async function toggleTaskCompletion(taskId, isChecked) {
 
     const taskItem = document.getElementById(`task-item-${taskId}`);
     const currentFilter = document.getElementById("task-filter").value;
+
     if (currentFilter && currentFilter !== newStatus) {
       taskItem && taskItem.remove();
     } else if (taskItem) {
       const statusBadge = taskItem.querySelector(".status-badge");
-      const taskText = taskItem.querySelector(".task-title");
       const editBtn = taskItem.querySelector(".edit-btn");
 
-      taskText.style.textDecoration = isChecked ? "line-through" : "none";
+      taskItem.classList.toggle("task-completed", isChecked);
+
       statusBadge.className = `status-badge status-${newStatus}`;
       statusBadge.textContent = newStatus;
+
       editBtn.disabled = isChecked;
     }
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error: ", error);
   }
 }
 
@@ -118,7 +124,7 @@ export async function removeTask(taskId) {
     taskDeleteDialog.dataset.taskId = taskId;
     taskDeleteDialog.showModal();
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error: ", error);
   }
 }
 
@@ -138,7 +144,7 @@ export async function viewTask(taskId) {
     );
     document.getElementById("task-view-dialog").showModal();
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error: ", error);
   }
 }
 
@@ -160,7 +166,7 @@ export async function editTask(taskId) {
     editForm.dataset.taskId = taskId;
     document.getElementById("task-edit-dialog").showModal();
   } catch (error) {
-    console.log(error);
+    logMessage("error", "Error: ", error);
   }
 }
 
