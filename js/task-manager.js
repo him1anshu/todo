@@ -1,13 +1,8 @@
-import {
-  getObjectStore,
-  getAllTasksByIndex,
-  getAllTasks,
-  getTask,
-  putTask,
-} from "./db.js";
+import { getAllTasksByIndex, getAllTasks, getTask, putTask } from "./db.js";
 import { renderTask, formatDateTime } from "./ui.js";
 import { updateDatePickerTheme } from "./date-picker-theme.js";
 import { dragstartHandler } from "./drag-drop.js";
+import { logMessage } from "./utility.js";
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -61,7 +56,7 @@ export async function clearFilters() {
 
 export async function sortTasks(sortBy) {
   try {
-    const tasks = await getAllTasks("tasks", "readonly");
+    let tasks = await getAllTasks("tasks", "readonly");
     const taskFilterValue = document.getElementById("task-filter").value;
     if (taskFilterValue) {
       tasks = tasks.filter((task) => task.status === taskFilterValue);

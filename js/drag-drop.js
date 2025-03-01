@@ -1,5 +1,6 @@
 import { getTask, putTask } from "./db.js";
-import { pushDataToStack } from "./undo-redo.js";
+import { undoRedoManager } from "./undo-redo.js";
+import { ReorderTaskCommand } from "./commands.js";
 import { logMessage } from "./utility.js";
 
 let draggedTaskId = null;
@@ -66,10 +67,10 @@ async function updateTaskItemsOrder() {
       });
 
       if (tasksList.length === counter - 1) {
-        pushDataToStack({
-          name: "task-reordered",
-          data: taskReorderedData,
-        });
+        // pushDataToStack({
+        //   name: "task-reordered",
+        //   data: taskReorderedData,
+        // });
       }
 
       await putTask("tasks", "readwrite", task);

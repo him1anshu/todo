@@ -2,10 +2,7 @@ import {
   openDBConnection,
   getAllTasksByIndex,
   getAllTasks,
-  addTask,
-  putTask,
   getTask,
-  deleteTask,
 } from "./db.js";
 import { registerServiceWorker } from "./serviceWorkerRegistration.js";
 import { dragoverHandler, dropHandler } from "./drag-drop.js";
@@ -22,13 +19,15 @@ import {
   toggleTheme,
   updateToggleBtn,
 } from "./task-manager.js";
-import {
-  pushDataToStack,
-  undoLatestTaskEvent,
-  redoLatestTaskEvent,
-} from "./undo-redo.js";
 import { renderTask } from "./ui.js";
 import { logMessage } from "./utility.js";
+
+import { undoRedoManager } from "./undo-redo.js";
+import {
+  CreateTaskCommand,
+  DeleteTaskCommand,
+  UpdateTaskCommand,
+} from "./commands.js";
 
 (function () {
   let db;
@@ -157,32 +156,10 @@ import { logMessage } from "./utility.js";
       };
 
       try {
-        await addTask("tasks", "readwrite", newTask);
-
-        const fragment = document.createDocumentFragment();
-
-        const taskFilter = document.querySelector("#task-filter");
-        const sortBy = document.querySelector("#sort-by");
-        if (taskFilter.value !== "completed") {
-          if (sortBy.value) {
-            await sortTasks(sortBy.value);
-          } else {
-            const taskItem = renderTask(newTask);
-            attachDragHandlerToTaskItem(newTask.id, taskItem);
-            fragment.appendChild(taskItem);
-          }
-        }
-
-        taskListContainer.appendChild(fragment);
+        await undoRedoManager.execute(new CreateTaskCommand(newTask));
 
         event.target.reset();
         document.getElementById("task-create-dialog").close();
-
-        pushDataToStack({
-          name: "task-created",
-          taskId: newTask.id,
-          data: newTask,
-        });
       } catch (error) {
         logMessage("error", "Error: ", error);
       }
@@ -196,15 +173,8 @@ import { logMessage } from "./utility.js";
           document.getElementById("task-delete-dialog").dataset.taskId;
 
         const task = await getTask("tasks", "readonly", taskId);
-        await deleteTask("tasks", "readwrite", taskId);
+        await undoRedoManager.execute(new DeleteTaskCommand(task.id, task));
 
-        pushDataToStack({
-          name: "task-deleted",
-          taskId,
-          data: task,
-        });
-
-        document.getElementById(`task-item-${taskId}`)?.remove();
         document.getElementById("task-delete-dialog").close();
       } catch (error) {
         logMessage("error", "Error: ", error);
@@ -230,34 +200,19 @@ import { logMessage } from "./utility.js";
       try {
         const task = await getTask("tasks", "readonly", taskId);
 
+        const prevData = { ...task };
+
         task.display = formData.get("display");
         task.description = formData.get("description");
         task["due-date"] = formData.get("due-date");
         task.priority = parseInt(formData.get("priority"), 10);
         task.updatedAt = new Date().toISOString();
 
-        await putTask("tasks", "readwrite", task);
+        await undoRedoManager.execute(
+          new UpdateTaskCommand(task.id, prevData, task)
+        );
 
-        const taskItem = document.getElementById(`task-item-${taskId}`);
-        if (taskItem) {
-          const sortBy = document.querySelector("#sort-by");
-          let isDraggable = true;
-          if (sortBy.value) {
-            isDraggable = false;
-          }
-
-          const newTaskItem = renderTask(task);
-          attachDragHandlerToTaskItem(task.id, newTaskItem, isDraggable);
-          taskListContainer.replaceChild(newTaskItem, taskItem);
-        }
         document.getElementById("task-edit-dialog").close();
-
-        pushDataToStack({
-          name: "task-updated",
-          taskId: task.id,
-          prevData: event.target.result,
-          newData: task,
-        });
       } catch (error) {
         logMessage("error", "Error: ", error);
       }
@@ -311,11 +266,11 @@ import { logMessage } from "./utility.js";
           break;
 
         case event.ctrlKey && key === "z":
-          undoLatestTaskEvent();
+          undoRedoManager.undo();
           break;
 
         case event.ctrlKey && key === "y":
-          redoLatestTaskEvent();
+          undoRedoManager.redo();
           break;
       }
     }

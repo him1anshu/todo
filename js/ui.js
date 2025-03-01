@@ -59,10 +59,16 @@ export function renderTask(task) {
     `;
 
   // Apply completed task styling
-  const taskText = taskItem.querySelector(`#task-${task.id}-text`);
   if (task.status === "completed") {
-    taskText.style.textDecoration = "line-through";
-    taskItem.querySelector(".edit-btn").disabled = true;
+    const statusBadge = taskItem.querySelector(".status-badge");
+    const editBtn = taskItem.querySelector(".edit-btn");
+
+    taskItem.classList.toggle("task-completed", true);
+
+    statusBadge.className = "status-badge status-completed";
+    statusBadge.textContent = "completed";
+
+    editBtn.disabled = true;
   }
 
   return taskItem;
