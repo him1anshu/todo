@@ -12,7 +12,7 @@ import { dragstartHandler } from "./drag-drop.js";
 const taskListContainer = document.getElementById("task-list");
 
 export function attachDragHandlerToTaskItem(id, taskItem, isDraggable = true) {
-  const dragHandle = document.getElementById(`task-${id}-drag`);
+  const dragHandle = taskItem.querySelector(`#task-${id}-drag`);
   if (dragHandle) {
     if (isDraggable) {
       dragHandle.draggable = true;

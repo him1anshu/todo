@@ -1,4 +1,6 @@
-import { getTask } from "./db.js";
+import { getTask, putTask } from "./db.js";
+import { pushDataToStack } from "./undo-redo.js";
+
 let draggedTaskId = null;
 const taskListContainer = document.getElementById("task-list");
 
@@ -69,7 +71,7 @@ async function updateTaskOrder() {
         });
       }
 
-      await getTask("tasks", "readonly", task);
+      await putTask("tasks", "readwrite", task);
     }
   } catch (error) {
     console.log(error);
