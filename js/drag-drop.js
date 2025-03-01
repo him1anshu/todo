@@ -1,6 +1,6 @@
 import { getTask, putTask } from "./db.js";
 import { pushDataToStack } from "./undo-redo.js";
-import { logMessage } from "./utility";
+import { logMessage } from "./utility.js";
 
 let draggedTaskId = null;
 const taskListContainer = document.getElementById("task-list");

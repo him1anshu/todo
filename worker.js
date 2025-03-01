@@ -1,9 +1,17 @@
-const CACHE_NAME = "task-manager-v2";
+const CACHE_NAME = "task-manager-v1";
 const URLS_TO_CACHE = [
   "/",
   "/index.html",
   "/css/styles.css",
+  "/js/date-picker-theme.js",
+  "/js/db.js",
+  "/js/drag-drop.js",
   "/js/script.js",
+  "/js/serviceWorkerRegistration.js",
+  "/js/task-manager.js",
+  "/js/ui.js",
+  "/js/undo-redo.js",
+  "/js/utility.js",
   "/assets/task-manager-logo.png",
   "/og-image.png",
   "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",

@@ -1,4 +1,4 @@
-import { logMessage } from "./utility";
+import { logMessage } from "./utility.js";
 
 export const registerServiceWorker = async () => {
   if ("serviceWorker" in navigator) {

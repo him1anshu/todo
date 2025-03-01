@@ -28,7 +28,7 @@ import {
   redoLatestTaskEvent,
 } from "./undo-redo.js";
 import { renderTask } from "./ui.js";
-import { logMessage } from "./utility";
+import { logMessage } from "./utility.js";
 
 (function () {
   let db;

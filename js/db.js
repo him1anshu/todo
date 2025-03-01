@@ -1,4 +1,4 @@
-import { logMessage } from "./utility";
+import { logMessage } from "./utility.js";
 
 const DB_NAME = "task-manager-db";
 const DB_VERSION = 1;

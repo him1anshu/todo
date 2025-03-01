@@ -1,7 +1,7 @@
 // import { renderTask } from "./ui.js";
 // import { sortTasks } from "./task-manager.js";
 // import { getObjectStore, renderAllTasks } from "./db.js";
-import { logMessage } from "./utility";
+import { logMessage } from "./utility.js";
 
 const taskListContainer = document.getElementById("task-list");
 
