@@ -39,6 +39,22 @@ export async function renderAllTasks() {
   }
 }
 
+export async function filterTasks(status) {
+  taskListContainer.innerHTML = "";
+  let tasks = await getAllTasksByIndex("tasks", "readonly", "status");
+
+  tasks = tasks.filter((task) => task.status === status);
+
+  const fragment = document.createDocumentFragment();
+  tasks.forEach((task) => {
+    const taskItem = renderTask(task);
+    attachDragHandlerToTaskItem(task.id, taskItem, false);
+    fragment.appendChild(taskItem);
+  });
+
+  taskListContainer.appendChild(fragment);
+}
+
 export async function clearFilters() {
   try {
     document.getElementById("task-filter").value = "";

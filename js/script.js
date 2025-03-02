@@ -1,14 +1,10 @@
-import {
-  openDBConnection,
-  getAllTasksByIndex,
-  getAllTasks,
-  getTask,
-} from "./db.js";
+import { openDBConnection, getAllTasks, getTask } from "./db.js";
 import { registerServiceWorker } from "./serviceWorkerRegistration.js";
 import { dragoverHandler, dropHandler } from "./drag-drop.js";
 import {
   attachDragHandlerToTaskItem,
   renderAllTasks,
+  filterTasks,
   clearFilters,
   sortTasks,
   toggleTaskCompletion,
@@ -23,7 +19,7 @@ import {
   taskDeleteHandler,
 } from "./task-manager.js";
 import { renderTask } from "./ui.js";
-import { logMessage } from "./utility.js";
+import { logMessage, showContextMenu, hideContextMenu } from "./utility.js";
 
 import { undoRedoManager } from "./undo-redo.js";
 import {
@@ -34,7 +30,7 @@ import {
 
 (function () {
   let db;
-  let tasks = [];
+  // let tasks = [];
   let latestPosition;
 
   const taskListContainer = document.getElementById("task-list");
@@ -52,20 +48,8 @@ import {
     .addEventListener("change", async (event) => {
       try {
         const status = event.target.value;
-        taskListContainer.innerHTML = "";
 
-        let tasks = await getAllTasksByIndex("tasks", "readonly", "status");
-
-        tasks = tasks.filter((task) => task.status === status);
-
-        const fragment = document.createDocumentFragment();
-        tasks.forEach((task) => {
-          const taskItem = renderTask(task);
-          attachDragHandlerToTaskItem(task.id, taskItem, false);
-          fragment.appendChild(taskItem);
-        });
-
-        taskListContainer.appendChild(fragment);
+        await filterTasks(status);
       } catch (error) {
         logMessage("error", "Error: ", error);
       }
@@ -289,4 +273,43 @@ import {
       }
     }
   });
+
+  // Custom context menu
+  document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    showContextMenu(event.clientX, event.clientY);
+  });
+
+  document.addEventListener("click", () => hideContextMenu());
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") hideContextMenu();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const menu = document.getElementById("context-menu");
+    if (menu.classList.contains("hidden")) return;
+
+    const items = Array.from(menu.querySelectorAll("li:not(.disabled)"));
+    let index = items.findIndex((item) => item.classList.contains("selected"));
+
+    if (event.key === "ArrowDown") {
+      index = (index + 1) % items.length;
+    } else if (event.key === "ArrowUp") {
+      index = (index - 1 + items.length) % items.length;
+    } else if (event.key === "Enter" && index !== -1) {
+      items[index].click();
+    }
+
+    items.forEach((item) => item.classList.remove("selected"));
+    if (index !== -1) items[index].classList.add("selected");
+  });
+
+  let touchTimer;
+  document.addEventListener("touchstart", (event) => {
+    touchTimer = setTimeout(() => {
+      showContextMenu(event.touches[0].clientX, event.touches[0].clientY);
+    }, 500); // Long press duration
+  });
+
+  document.addEventListener("touchend", () => clearTimeout(touchTimer));
 })();
