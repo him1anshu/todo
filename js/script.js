@@ -18,6 +18,9 @@ import {
   showCreateTaskModal,
   toggleTheme,
   updateToggleBtn,
+  taskCreateHandler,
+  taskUpdateHandler,
+  taskDeleteHandler,
 } from "./task-manager.js";
 import { renderTask } from "./ui.js";
 import { logMessage } from "./utility.js";
@@ -246,6 +249,17 @@ import {
   // Theme Toggling
   const toggleButton = document.getElementById("theme-toggle");
   toggleButton.addEventListener("click", toggleTheme);
+
+  // Custom event handlers for tasks
+  document.addEventListener("task-created", async (event) => {
+    await taskCreateHandler(event);
+  });
+  document.addEventListener("task-updated", (event) => {
+    taskUpdateHandler(event);
+  });
+  document.addEventListener("task-deleted", (event) => {
+    taskDeleteHandler(event);
+  });
 
   // Register key bindings
   document.addEventListener("keydown", async (event) => {

@@ -15,3 +15,10 @@ export function logMessage(type, message, data = null) {
       console.log(`[LOG] [${timestamp}]: ${message}`, data ?? "");
   }
 }
+
+export function updateDatePickerTheme() {
+  const isDarkTheme =
+    document.documentElement.getAttribute("data-theme") === "dark";
+
+  document.body.classList.toggle("dark-theme", isDarkTheme);
+}

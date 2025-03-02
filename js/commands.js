@@ -1,6 +1,4 @@
 import { getTask, addTask, putTask, deleteTask } from "./db.js";
-import { attachDragHandlerToTaskItem, sortTasks } from "./task-manager.js";
-import { renderTask } from "./ui.js";
 import { logMessage } from "./utility.js";
 
 const taskListContainer = document.getElementById("task-list");
@@ -25,26 +23,18 @@ export class CreateTaskCommand extends TaskCommand {
 
   async execute() {
     await addTask("tasks", "readwrite", this.task);
-    const fragment = document.createDocumentFragment();
-    const taskFilter = document.querySelector("#task-filter");
-    const sortBy = document.querySelector("#sort-by");
-
-    if (taskFilter.value !== "completed") {
-      if (sortBy.value) {
-        await sortTasks(sortBy.value);
-      } else {
-        const taskItem = renderTask(this.task);
-        attachDragHandlerToTaskItem(this.taskId, taskItem);
-        fragment.appendChild(taskItem);
-      }
-    }
-
-    taskListContainer.appendChild(fragment);
+    document.dispatchEvent(
+      new CustomEvent("task-created", {
+        detail: { taskId: this.taskId, task: this.task },
+      })
+    );
   }
 
   async undo() {
     await deleteTask("tasks", "readwrite", this.taskId);
-    document.getElementById(`task-item-${this.taskId}`)?.remove();
+    document.dispatchEvent(
+      new CustomEvent("task-deleted", { detail: { taskId: this.taskId } })
+    );
   }
 }
 
@@ -56,26 +46,18 @@ export class DeleteTaskCommand extends TaskCommand {
 
   async execute() {
     await deleteTask("tasks", "readwrite", this.taskId);
-    document.getElementById(`task-item-${this.taskId}`)?.remove();
+    document.dispatchEvent(
+      new CustomEvent("task-deleted", { detail: { taskId: this.taskId } })
+    );
   }
 
   async undo() {
     await addTask("tasks", "readwrite", this.task);
-    const fragment = document.createDocumentFragment();
-    const taskFilter = document.querySelector("#task-filter");
-    const sortBy = document.querySelector("#sort-by");
-
-    if (taskFilter.value !== "completed") {
-      if (sortBy.value) {
-        await sortTasks(sortBy.value);
-      } else {
-        const taskItem = renderTask(this.task);
-        attachDragHandlerToTaskItem(this.taskId, taskItem);
-        fragment.appendChild(taskItem);
-      }
-    }
-
-    taskListContainer.appendChild(fragment);
+    document.dispatchEvent(
+      new CustomEvent("task-created", {
+        detail: { taskId: this.taskId, task: this.task },
+      })
+    );
   }
 }
 
@@ -88,34 +70,26 @@ export class UpdateTaskCommand extends TaskCommand {
 
   async execute() {
     await putTask("tasks", "readwrite", this.newData);
-    const taskItem = document.getElementById(`task-item-${this.taskId}`);
-    if (taskItem) {
-      const sortBy = document.querySelector("#sort-by");
-      let isDraggable = true;
-      if (sortBy.value) {
-        isDraggable = false;
-      }
-
-      const newTaskItem = renderTask(this.newData);
-      attachDragHandlerToTaskItem(this.taskId, newTaskItem, isDraggable);
-      taskListContainer.replaceChild(newTaskItem, taskItem);
-    }
+    document.dispatchEvent(
+      new CustomEvent("task-updated", {
+        detail: {
+          taskId: this.taskId,
+          task: this.newData,
+        },
+      })
+    );
   }
 
   async undo() {
     await putTask("tasks", "readwrite", this.prevData);
-    const taskItem = document.getElementById(`task-item-${this.taskId}`);
-    if (taskItem) {
-      const sortBy = document.querySelector("#sort-by");
-      let isDraggable = true;
-      if (sortBy.value) {
-        isDraggable = false;
-      }
-
-      const newTaskItem = renderTask(this.newData);
-      attachDragHandlerToTaskItem(this.taskId, newTaskItem, isDraggable);
-      taskListContainer.replaceChild(newTaskItem, taskItem);
-    }
+    document.dispatchEvent(
+      new CustomEvent("task-updated", {
+        detail: {
+          taskId: this.taskId,
+          task: this.prevData,
+        },
+      })
+    );
   }
 }
 

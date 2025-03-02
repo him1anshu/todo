@@ -1,10 +1,9 @@
-const CACHE_NAME = "task-manager-v1";
+const CACHE_NAME = "task-manager-v3";
 const URLS_TO_CACHE = [
   "/",
   "/index.html",
   "/css/styles.css",
   "/js/commands.js",
-  "/js/date-picker-theme.js",
   "/js/db.js",
   "/js/drag-drop.js",
   "/js/script.js",

@@ -1,8 +1,7 @@
 import { getAllTasksByIndex, getAllTasks, getTask, putTask } from "./db.js";
 import { renderTask, formatDateTime } from "./ui.js";
-import { updateDatePickerTheme } from "./date-picker-theme.js";
 import { dragstartHandler } from "./drag-drop.js";
-import { logMessage } from "./utility.js";
+import { updateDatePickerTheme, logMessage } from "./utility.js";
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -194,4 +193,47 @@ export function updateToggleBtn(theme) {
       : `<i class="fa-solid fa-moon fa-xl"></i>`;
 
   updateDatePickerTheme();
+}
+
+export async function taskCreateHandler(event) {
+  const { taskId, task } = event.detail;
+
+  const fragment = document.createDocumentFragment();
+  const taskFilter = document.querySelector("#task-filter");
+  const sortBy = document.querySelector("#sort-by");
+
+  if (taskFilter.value !== "completed") {
+    if (sortBy.value) {
+      await sortTasks(sortBy.value);
+    } else {
+      const taskItem = renderTask(task);
+      attachDragHandlerToTaskItem(taskId, taskItem);
+      fragment.appendChild(taskItem);
+    }
+  }
+
+  taskListContainer.appendChild(fragment);
+}
+
+export function taskUpdateHandler(event) {
+  const { taskId, task } = event.detail;
+
+  const taskItem = document.getElementById(`task-item-${taskId}`);
+  if (taskItem) {
+    const sortBy = document.querySelector("#sort-by");
+    let isDraggable = true;
+    if (sortBy.value) {
+      isDraggable = false;
+    }
+
+    const newTaskItem = renderTask(task);
+    attachDragHandlerToTaskItem(taskId, newTaskItem, isDraggable);
+    taskListContainer.replaceChild(newTaskItem, taskItem);
+  }
+}
+
+export function taskDeleteHandler(event) {
+  const { taskId } = event.detail;
+
+  document.getElementById(`task-item-${taskId}`)?.remove();
 }
