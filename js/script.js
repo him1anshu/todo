@@ -329,17 +329,13 @@ import {
     }
   });
 
-  document.addEventListener(
-    "touchmove",
-    (event) => {
-      if (isDragging) {
-        touchMoveHandler(event);
-      } else {
-        clearTimeout(touchTimer);
-      }
-    },
-    { passive: false }
-  );
+  document.addEventListener("touchmove", (event) => {
+    if (isDragging) {
+      touchMoveHandler(event);
+    } else {
+      clearTimeout(touchTimer);
+    }
+  });
 
   document.addEventListener("touchend", (event) => {
     if (isDragging) {

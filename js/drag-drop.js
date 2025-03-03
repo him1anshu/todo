@@ -45,7 +45,7 @@ export function touchMoveHandler(event) {
     document.elementFromPoint(touch.clientX, touch.clientY)
   );
 
-  event.preventDefault();
+  // event.preventDefault();
 }
 
 export function touchEndHandler(event) {
