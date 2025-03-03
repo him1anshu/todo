@@ -140,6 +140,9 @@
     padding: 0;
     box-sizing: border-box;
     user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    touch-action: none;
 }
 
 body {
@@ -387,10 +390,6 @@ button {
     gap: 1.5rem;
     padding: 1.5rem;
     border-bottom: 1px solid var(--border-color);
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    touch-action: none;
 }
 
 .task-item:last-child {
@@ -771,12 +770,6 @@ select[disabled] {
     display: none;
 }
 
-#context-menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
 #context-menu li {
     list-style: none;
     padding: 8px 12px;
@@ -795,6 +788,5 @@ select[disabled] {
 
 
 #context-menu li.selected {
-    background: #007bff;
-    color: white;
+    background: #f0f0f0;
 }

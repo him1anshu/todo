@@ -103,6 +103,8 @@ export function showContextMenu(x, y) {
 
 function positionMenu(menu, x, y) {
   const { innerWidth, innerHeight } = window;
+
+  menu.classList.remove("hidden");
   const { offsetWidth, offsetHeight } = menu;
 
   // Adjust if it overflows
@@ -111,7 +113,6 @@ function positionMenu(menu, x, y) {
 
   menu.style.left = `${x}px`;
   menu.style.top = `${y}px`;
-  menu.classList.remove("hidden");
 }
 
 export function hideContextMenu() {
