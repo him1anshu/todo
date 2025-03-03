@@ -1,6 +1,12 @@
 import { openDBConnection, getAllTasks, getTask } from "./db.js";
 import { registerServiceWorker } from "./serviceWorkerRegistration.js";
-import { dragoverHandler, dropHandler } from "./drag-drop.js";
+import {
+  dragoverHandler,
+  dropHandler,
+  touchStartHandler,
+  touchMoveHandler,
+  touchEndHandler,
+} from "./drag-drop.js";
 import {
   attachDragHandlerToTaskItem,
   renderAllTasks,
@@ -34,8 +40,6 @@ import {
   let latestPosition;
 
   const taskListContainer = document.getElementById("task-list");
-  taskListContainer.addEventListener("dragover", dragoverHandler);
-  taskListContainer.addEventListener("drop", dropHandler);
 
   registerServiceWorker();
 
@@ -304,12 +308,45 @@ import {
     if (index !== -1) items[index].classList.add("selected");
   });
 
+  // Drag and Drop Mouse events
+  document.addEventListener("dragover", dragoverHandler);
+  document.addEventListener("drop", dropHandler);
+
   let touchTimer;
+  let isDragging;
   document.addEventListener("touchstart", (event) => {
-    touchTimer = setTimeout(() => {
-      showContextMenu(event.touches[0].clientX, event.touches[0].clientY);
-    }, 500); // Long press duration
+    const dragButton = event.target.closest(".task-drag-container");
+
+    if (dragButton) {
+      // Prevent long press from triggering if touching the drag button
+      isDragging = true;
+      touchStartHandler(event);
+    } else {
+      // If it's not a drag button, start the long-press timer
+      touchTimer = setTimeout(() => {
+        showContextMenu(event.touches[0].clientX, event.touches[0].clientY);
+      }, 500);
+    }
   });
 
-  document.addEventListener("touchend", () => clearTimeout(touchTimer));
+  document.addEventListener(
+    "touchmove",
+    (event) => {
+      if (isDragging) {
+        touchMoveHandler(event);
+      } else {
+        clearTimeout(touchTimer);
+      }
+    },
+    { passive: false }
+  );
+
+  document.addEventListener("touchend", (event) => {
+    if (isDragging) {
+      touchEndHandler(event);
+      isDragging = false;
+    } else {
+      clearTimeout(touchTimer);
+    }
+  });
 })();

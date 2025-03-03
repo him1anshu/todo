@@ -676,6 +676,13 @@ select[disabled] {
 }
 
 @media (max-width: 900px) {
+    .nav-brand {
+        text-align: left;
+        justify-self: flex-start;
+        flex-grow: 1;
+        margin-left: 1rem;
+    }
+
     .controls-group {
         flex-direction: column;
     }

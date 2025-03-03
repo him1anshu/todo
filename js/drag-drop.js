@@ -3,6 +3,7 @@ import { ReorderTaskCommand } from "./commands.js";
 
 let draggedTaskId = null;
 
+// Mouse Event Handlers
 export function dragstartHandler(event) {
   const taskItem = event.target.closest(".task-item");
   if (!taskItem) return;
@@ -13,11 +14,50 @@ export function dragstartHandler(event) {
 
 export function dragoverHandler(event) {
   event.preventDefault(); // Allow drop
-  const targetTask = event.target.closest(".task-item");
+  handleReorder(event.clientY, event.target);
+}
+
+export async function dropHandler(event) {
+  event.preventDefault();
+  finalizeDrop();
+}
+
+// Touch Event Handlers
+export function touchStartHandler(event) {
+  const taskItem = event.target.closest(".task-item");
+  if (!taskItem) return;
+  draggedTaskId = taskItem.id;
+  taskItem.classList.add("dragging");
+
+  const touch = event.touches[0];
+  taskItem.dataset.offsetY =
+    touch.clientY - taskItem.getBoundingClientRect().top;
+
+  event.preventDefault();
+}
+
+export function touchMoveHandler(event) {
+  if (!draggedTaskId) return;
+
+  const touch = event.touches[0];
+  handleReorder(
+    touch.clientY,
+    document.elementFromPoint(touch.clientX, touch.clientY)
+  );
+
+  event.preventDefault();
+}
+
+export function touchEndHandler(event) {
+  finalizeDrop();
+}
+
+function handleReorder(clientY, targetElement) {
+  const targetTask = targetElement.closest(".task-item");
   if (!targetTask || targetTask.id === draggedTaskId) return;
 
   const bounding = targetTask.getBoundingClientRect();
-  const offset = event.clientY - bounding.top;
+  const offset = clientY - bounding.top;
   const middle = bounding.height / 2;
 
   if (offset > middle) {
@@ -33,9 +73,7 @@ export function dragoverHandler(event) {
   }
 }
 
-export async function dropHandler(event) {
-  event.preventDefault();
-
+async function finalizeDrop() {
   if (!draggedTaskId) return;
 
   const draggedElement = document.getElementById(draggedTaskId);
@@ -44,42 +82,7 @@ export async function dropHandler(event) {
   }
 
   const [, taskId] = draggedTaskId.split("task-item-");
-
   await undoRedoManager.execute(new ReorderTaskCommand(taskId));
 
   draggedTaskId = null;
 }
-
-// async function updateTaskItemsOrder() {
-//   let counter = 1;
-//   const taskReorderedData = [];
-//   const tasksList = [...taskListContainer.children];
-
-//   try {
-//     for (const taskItem of tasksList) {
-//       const [, taskId] = taskItem.id.split("task-item-");
-
-//       const taskData = await getTask("tasks", "readonly", taskId);
-
-//       const task = { ...taskData };
-//       task.position = counter++;
-
-//       taskReorderedData.push({
-//         taskId: task.id,
-//         prevPos: taskData.position,
-//         newPos: task.position,
-//       });
-
-//       if (tasksList.length === counter - 1) {
-//         // pushDataToStack({
-//         //   name: "task-reordered",
-//         //   data: taskReorderedData,
-//         // });
-//       }
-
-//       await putTask("tasks", "readwrite", task);
-//     }
-//   } catch (error) {
-//     logMessage("error", "Error in updating tasks order", error);
-//   }
-// }

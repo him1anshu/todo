@@ -1,6 +1,6 @@
 import { getAllTasksByIndex, getAllTasks, getTask, putTask } from "./db.js";
 import { renderTask, formatDateTime } from "./ui.js";
-import { dragstartHandler } from "./drag-drop.js";
+import { dragstartHandler, touchStartHandler } from "./drag-drop.js";
 import { updateDatePickerTheme, logMessage } from "./utility.js";
 
 const taskListContainer = document.getElementById("task-list");
@@ -11,6 +11,7 @@ export function attachDragHandlerToTaskItem(id, taskItem, isDraggable = true) {
     if (isDraggable) {
       dragHandle.draggable = true;
       dragHandle.addEventListener("dragstart", dragstartHandler);
+      dragHandle.addEventListener("touchStart", touchStartHandler);
     } else {
       const taskMeta = taskItem.querySelector(`.task-meta`);
       taskMeta.removeChild(dragHandle);
