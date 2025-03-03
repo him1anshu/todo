@@ -139,6 +139,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    user-select: none;
 }
 
 body {
@@ -386,6 +387,10 @@ button {
     gap: 1.5rem;
     padding: 1.5rem;
     border-bottom: 1px solid var(--border-color);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
 }
 
 .task-item:last-child {
@@ -540,11 +545,16 @@ input[type="checkbox"]:disabled {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    overflow: hidden;
 }
 
 .task-title {
+    width: inherit;
     font-weight: 500;
     color: var(--text-main);
+    white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 }
 
 .task-details {
@@ -610,7 +620,8 @@ input[type="checkbox"]:disabled {
 }
 
 dialog::backdrop {
-    background: rgba(0, 0, 0, 0.3);
+    /* background: rgba(0, 0, 0, 0.3); */
+    backdrop-filter: blur(4px);
 }
 
 form h2 {
@@ -645,7 +656,7 @@ textarea {
     resize: none;
 }
 
-.form-element input[readonly],
+.form-element input[readonly], textarea[readonly],
 select[disabled] {
     cursor: not-allowed;
 }

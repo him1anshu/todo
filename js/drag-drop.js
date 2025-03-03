@@ -32,20 +32,27 @@ export function touchStartHandler(event) {
   const touch = event.touches[0];
   taskItem.dataset.offsetY =
     touch.clientY - taskItem.getBoundingClientRect().top;
-
-  event.preventDefault();
 }
+
+let scrollSpeed = 10; // Speed of auto-scrolling
 
 export function touchMoveHandler(event) {
   if (!draggedTaskId) return;
 
   const touch = event.touches[0];
-  handleReorder(
-    touch.clientY,
-    document.elementFromPoint(touch.clientX, touch.clientY)
-  );
+  const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
 
-  // event.preventDefault();
+  handleReorder(touch.clientY, targetElement);
+
+  // Enable auto-scrolling when dragging near screen edges
+  const buffer = 50; // Pixels from the edge to trigger scrolling
+  if (touch.clientY < buffer) {
+    // Scroll up
+    window.scrollBy({ top: -scrollSpeed, behavior: "smooth" });
+  } else if (touch.clientY > window.innerHeight - buffer) {
+    // Scroll down
+    window.scrollBy({ top: scrollSpeed, behavior: "smooth" });
+  }
 }
 
 export function touchEndHandler(event) {

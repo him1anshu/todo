@@ -150,9 +150,9 @@ export async function viewTask(taskId) {
     document.getElementById("task-view-created").value = formatDateTime(
       task.createdAt
     );
-    document.getElementById("task-view-updated").value = formatDateTime(
-      task.updatedAt
-    );
+    // document.getElementById("task-view-updated").value = formatDateTime(
+    //   task.updatedAt
+    // );
     document.getElementById("task-view-dialog").showModal();
   } catch (error) {
     logMessage("error", "Error: ", error);

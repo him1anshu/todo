@@ -314,28 +314,39 @@ import {
 
   let touchTimer;
   let isDragging;
-  document.addEventListener("touchstart", (event) => {
-    const dragButton = event.target.closest(".task-drag-container");
+  document.addEventListener(
+    "touchstart",
+    (event) => {
+      const dragButton = event.target.closest(".task-drag-container");
 
-    if (dragButton) {
-      // Prevent long press from triggering if touching the drag button
-      isDragging = true;
-      touchStartHandler(event);
-    } else {
-      // If it's not a drag button, start the long-press timer
-      touchTimer = setTimeout(() => {
-        showContextMenu(event.touches[0].clientX, event.touches[0].clientY);
-      }, 500);
-    }
-  });
+      if (dragButton) {
+        isDragging = true;
+        touchStartHandler(event);
 
-  document.addEventListener("touchmove", (event) => {
-    if (isDragging) {
-      touchMoveHandler(event);
-    } else {
-      clearTimeout(touchTimer);
-    }
-  });
+        if (event.touches.length === 1) {
+          event.preventDefault();
+        }
+      } else {
+        touchTimer = setTimeout(() => {
+          showContextMenu(event.touches[0].clientX, event.touches[0].clientY);
+        }, 500);
+      }
+    },
+    { passive: false } // Ensures preventDefault() works
+  );
+
+  document.addEventListener(
+    "touchmove",
+    (event) => {
+      if (isDragging) {
+        touchMoveHandler(event);
+        event.preventDefault();
+      } else {
+        clearTimeout(touchTimer);
+      }
+    },
+    { passive: false }
+  );
 
   document.addEventListener("touchend", (event) => {
     if (isDragging) {

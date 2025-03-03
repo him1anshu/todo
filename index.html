@@ -114,11 +114,12 @@
         <h2>Create New Task</h2>
         <div class="form-element">
           <label for="task-create-display">Task</label>
-          <input type="text" name="display" id="task-create-display" placeholder="Enter task..." required />
+          <!-- <input type="text" name="display" id="task-create-display" placeholder="Enter task..." required /> -->
+          <textarea name="display" id="task-create-display" placeholder="Enter task..." rows="1" required></textarea>
         </div>
         <div class="form-element">
           <label for="task-create-description">Details</label>
-          <textarea name="description" id="task-create-description" placeholder="Enter additional details..." rows="5"></textarea>
+          <textarea name="description" id="task-create-description" placeholder="Enter additional details..." rows="3"></textarea>
         </div>
         <div class="form-element">
           <label for="task-create-due-date">Due Date</label>
@@ -146,11 +147,12 @@
         <h2>Task Details</h2>
         <div class="form-element">
           <label for="task-view-display">Task</label>
-          <input type="text" name="display" id="task-view-display" readonly />
+          <!-- <input type="text" name="display" id="task-view-display" readonly /> -->
+          <textarea name="display" id="task-view-display" readonly></textarea>
         </div>
         <div class="form-element">
           <label for="task-view-description">Details</label>
-          <textarea name="description" id="task-view-description" rows="5" readonly></textarea>
+          <textarea name="description" id="task-view-description" readonly></textarea>
         </div>
         <div class="form-element">
           <label for="task-view-due-date">Due Date</label>
@@ -169,10 +171,10 @@
           <label for="task-view-created">Created at</label>
           <input type="text" name="created_at" id="task-view-created" readonly />
         </div>
-        <div class="form-element">
+        <!-- <div class="form-element">
           <label for="task-view-updated">Updated at</label>
           <input type="text" name="updated_at" id="task-view-updated" readonly />
-        </div>
+        </div> -->
         <div class="form-actions">
           <button type="submit" id="task-view-close" class="btn-cancel">Close</button>
         </div>
@@ -185,11 +187,12 @@
         <h2>Update Task Details</h2>
         <div class="form-element">
           <label for="task-edit-display">Task</label>
-          <input type="text" name="display" id="task-edit-display" required />
+          <!-- <input type="text" name="display" id="task-edit-display" required /> -->
+          <textarea name="display" id="task-edit-display" required></textarea>
         </div>
         <div class="form-element">
           <label for="task-edit-description">Details</label>
-          <textarea name="description" id="task-edit-description" rows="5"></textarea>
+          <textarea name="description" id="task-edit-description" rows="3"></textarea>
         </div>
         <div class="form-element">
           <label for="task-edit-due-date">Due Date</label>
@@ -217,7 +220,8 @@
         <h2>Delete Task</h2>
         <div class="form-element">
           <label for="task-delete-display">Task</label>
-          <input type="text" name="display" id="task-delete-display" readonly />
+          <!-- <input type="text" name="display" id="task-delete-display" readonly /> -->
+          <textarea name="display" id="task-delete-display" readonly></textarea>
         </div>
         <div class="form-actions">
           <button type="submit" id="task-delete-submit" class="btn-create">Delete</button>
