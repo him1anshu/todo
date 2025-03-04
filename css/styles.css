@@ -140,9 +140,12 @@
     padding: 0;
     box-sizing: border-box;
     user-select: none;
-    -webkit-touch-callout: none;
     -webkit-user-select: none;
-    touch-action: none;
+}
+
+html, body {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -843,6 +846,11 @@ select[disabled] {
     width: 18px;
     height: 18px;
     opacity: 0.8;
+}
+
+.hidden {
+    display: none;
+    pointer-events: none;
 }
 
 /* Dark theme adjustments */

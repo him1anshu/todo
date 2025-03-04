@@ -34,8 +34,6 @@ export function touchStartHandler(event) {
     touch.clientY - taskItem.getBoundingClientRect().top;
 }
 
-let scrollSpeed = 10; // Speed of auto-scrolling
-
 export function touchMoveHandler(event) {
   if (!draggedTaskId) return;
 
@@ -44,14 +42,14 @@ export function touchMoveHandler(event) {
 
   handleReorder(touch.clientY, targetElement);
 
-  // Enable auto-scrolling when dragging near screen edges
-  const buffer = 50; // Pixels from the edge to trigger scrolling
+  // Enable auto-scrolling with more sensitivity
+  const buffer = 70; // Increase buffer for better response
+  const scrollStep = 15; // Slightly increase speed
+
   if (touch.clientY < buffer) {
-    // Scroll up
-    window.scrollBy({ top: -scrollSpeed, behavior: "smooth" });
+    window.scrollBy({ top: -scrollStep, behavior: "smooth" });
   } else if (touch.clientY > window.innerHeight - buffer) {
-    // Scroll down
-    window.scrollBy({ top: scrollSpeed, behavior: "smooth" });
+    window.scrollBy({ top: scrollStep, behavior: "smooth" });
   }
 }
 

@@ -126,9 +126,7 @@ export function handleContextMenu(event) {
 }
 
 export function handleClickOutside(event) {
-  if (!contextMenu.contains(event.target)) {
-    hideContextMenu();
-  }
+  hideContextMenu();
 }
 
 export function handleTouchStart(event) {
@@ -138,23 +136,25 @@ export function handleTouchStart(event) {
     clearTimeout(touchTimer);
     isDragging = true;
     touchStartHandler(event);
+    return; // Skip setting touchTimer for the context menu
+  }
 
-    if (event.touches.length === 1) {
-      event.preventDefault();
-    }
-  } else {
-    touchStartPosition = {
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
-    };
+  // Regular touch logic for context menu
+  touchStartPosition = {
+    x: event.touches[0].clientX,
+    y: event.touches[0].clientY,
+  };
 
-    touchTimer = setTimeout(() => {
+  touchTimer = setTimeout(() => {
+    if (!isDragging) {
+      // Only show menu if not dragging
       showContextMenu(touchStartPosition.x, touchStartPosition.y);
       provideHapticFeedback();
-    }, 500);
-  }
+    }
+  }, 500);
 }
 
+// In handleTouchMove function:
 export function handleTouchMove(event) {
   if (isDragging) {
     touchMoveHandler(event);
@@ -168,6 +168,7 @@ export function handleTouchMove(event) {
       if (deltaX > moveThreshold || deltaY > moveThreshold) {
         clearTimeout(touchTimer);
         touchStartPosition = null;
+        return;
       }
     }
   }
@@ -259,7 +260,6 @@ function handleMenuItemKeyPress(event) {
 function activateMenuItem(index) {
   const item = menuItems[index];
   if (item?.enabled) {
-    hideContextMenu();
     item.action(item.params);
   }
 }
