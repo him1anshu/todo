@@ -1,4 +1,4 @@
-const CACHE_NAME = "task-manager-v1";
+const CACHE_NAME = "task-manager-v2";
 const URLS_TO_CACHE = [
   "/",
   "/index.html",
@@ -130,4 +130,26 @@ self.addEventListener("fetch", (event) => {
   // }
 
   event.respondWith(networkFirst(request));
+});
+
+self.addEventListener("periodicsync", async (event) => {
+  if (event.tag === "check-tasks") {
+    event.waitUntil(
+      self.clients.matchAll().then((clients) => {
+        clients.forEach((client) =>
+          client.postMessage({ action: "checkDueTasks" })
+        );
+      })
+    );
+  }
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data.action === "sendNotification") {
+    const { title, message } = event.data;
+    self.registration.showNotification(title, {
+      body: message,
+      icon: "../og-image.png",
+    });
+  }
 });

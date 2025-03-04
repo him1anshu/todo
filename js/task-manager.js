@@ -1,7 +1,11 @@
 import { getAllTasksByIndex, getAllTasks, getTask, putTask } from "./db.js";
 import { renderTask, formatDateTime } from "./ui.js";
 import { dragstartHandler, touchStartHandler } from "./drag-drop.js";
-import { updateDatePickerTheme, logMessage } from "./utility.js";
+import {
+  updateDatePickerTheme,
+  logMessage,
+  sendNotification,
+} from "./utility.js";
 
 const taskListContainer = document.getElementById("task-list");
 
@@ -253,4 +257,45 @@ export function taskDeleteHandler(event) {
   const { taskId } = event.detail;
 
   document.getElementById(`task-item-${taskId}`)?.remove();
+}
+
+export async function checkDueTasks(swTriggered = false) {
+  console.log("Checking due date");
+  const currTime = new Date().getTime();
+  const tasks = await getAllTasksByIndex("tasks", "readonly", "position");
+  const updateTasks = [];
+
+  tasks.forEach((task) => {
+    const dueTime = new Date(task["due-date"]).getTime();
+    const timeDiff = dueTime - currTime;
+
+    if (timeDiff <= 0 && !task["overdue-notification-sent"]) {
+      if (swTriggered) {
+        navigator.serviceWorker.controller?.postMessage({
+          action: "sendNotification",
+          title: task.display,
+          message: "Task is overdue!!",
+        });
+      } else {
+        sendNotification(task.display, `Task is overdue!!`);
+      }
+      task["overdue-notification-sent"] = true;
+      updateTasks.push(putTask("tasks", "readwrite", task));
+    } else if (timeDiff <= 3600000 && !task["due-notification-sent"]) {
+      if (swTriggered) {
+        navigator.serviceWorker.controller?.postMessage({
+          action: "sendNotification",
+          title: task.display,
+          message: "Due date for task is approaching!!",
+        });
+      } else {
+        sendNotification(task.display, `Due date for task is approaching!!`);
+      }
+
+      task["due-notification-sent"] = true;
+      updateTasks.push(putTask("tasks", "readwrite", task));
+    }
+  });
+
+  await Promise.all(updateTasks);
 }

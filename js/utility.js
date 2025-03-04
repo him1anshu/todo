@@ -29,6 +29,15 @@ export function updateDatePickerTheme() {
   document.body.classList.toggle("dark-theme", isDarkTheme);
 }
 
+export function sendNotification(title, message) {
+  if (Notification.permission === "granted") {
+    new Notification(title, {
+      body: message,
+      icon: "../og-image.png",
+    });
+  }
+}
+
 const menuItems = [
   {
     label: "New Task",

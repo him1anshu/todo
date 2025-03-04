@@ -231,6 +231,19 @@ import {
       logMessage("log", "Database connection established!");
 
       latestPosition = await renderAllTasks();
+
+      if (Notification.permission === "default") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Notifications enabled!");
+          }
+        });
+      }
+
+      // Nofication for tasks
+      // setInterval(async () => {
+      //   await checkDueTasks();
+      // }, 60000);
     } catch (error) {
       logMessage("error", "Error opening database:", error);
     }
