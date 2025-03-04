@@ -1,12 +1,6 @@
 import { openDBConnection, getAllTasks, getTask } from "./db.js";
 import { registerServiceWorker } from "./serviceWorkerRegistration.js";
-import {
-  dragoverHandler,
-  dropHandler,
-  touchStartHandler,
-  touchMoveHandler,
-  touchEndHandler,
-} from "./drag-drop.js";
+import { dragoverHandler, dropHandler } from "./drag-drop.js";
 import {
   attachDragHandlerToTaskItem,
   renderAllTasks,
@@ -25,7 +19,15 @@ import {
   taskDeleteHandler,
 } from "./task-manager.js";
 import { renderTask } from "./ui.js";
-import { logMessage, showContextMenu, hideContextMenu } from "./utility.js";
+import {
+  logMessage,
+  handleContextMenu,
+  handleClickOutside,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
+  handleKeyNavigation,
+} from "./utility.js";
 
 import { undoRedoManager } from "./undo-redo.js";
 import {
@@ -279,81 +281,19 @@ import {
   });
 
   // Custom context menu
-  document.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-    showContextMenu(event.clientX, event.clientY);
-  });
-
-  document.addEventListener("click", () => hideContextMenu());
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") hideContextMenu();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    const menu = document.getElementById("context-menu");
-    if (menu.classList.contains("hidden")) return;
-
-    const items = Array.from(menu.querySelectorAll("li:not(.disabled)"));
-    let index = items.findIndex((item) => item.classList.contains("selected"));
-
-    if (event.key === "ArrowDown") {
-      index = (index + 1) % items.length;
-    } else if (event.key === "ArrowUp") {
-      index = (index - 1 + items.length) % items.length;
-    } else if (event.key === "Enter" && index !== -1) {
-      items[index].click();
-    }
-
-    items.forEach((item) => item.classList.remove("selected"));
-    if (index !== -1) items[index].classList.add("selected");
-  });
+  document.addEventListener("contextmenu", handleContextMenu);
+  document.addEventListener("click", handleClickOutside);
+  document.addEventListener("keydown", handleKeyNavigation);
 
   // Drag and Drop Mouse events
   document.addEventListener("dragover", dragoverHandler);
   document.addEventListener("drop", dropHandler);
 
-  let touchTimer;
-  let isDragging;
   document.addEventListener(
     "touchstart",
-    (event) => {
-      const dragButton = event.target.closest(".task-drag-container");
-
-      if (dragButton) {
-        isDragging = true;
-        touchStartHandler(event);
-
-        if (event.touches.length === 1) {
-          event.preventDefault();
-        }
-      } else {
-        touchTimer = setTimeout(() => {
-          showContextMenu(event.touches[0].clientX, event.touches[0].clientY);
-        }, 500);
-      }
-    },
+    handleTouchStart,
     { passive: false } // Ensures preventDefault() works
   );
-
-  document.addEventListener(
-    "touchmove",
-    (event) => {
-      if (isDragging) {
-        touchMoveHandler(event);
-        event.preventDefault();
-      } else {
-        clearTimeout(touchTimer);
-      }
-    },
-    { passive: false }
-  );
-
-  document.addEventListener("touchend", (event) => {
-    if (isDragging) {
-      touchEndHandler(event);
-      isDragging = false;
-    } else {
-      clearTimeout(touchTimer);
-    }
-  });
+  document.addEventListener("touchmove", handleTouchMove, { passive: false });
+  document.addEventListener("touchend", handleTouchEnd);
 })();

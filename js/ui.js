@@ -28,9 +28,7 @@ export function renderTask(task) {
         )}"></div>
       </div>
       <div class="task-content">
-        <h3 class="task-title" id="task-${
-          task.id
-        }-text" contenteditable="true" >${task.display}</h3>
+        <h3 class="task-title" id="task-${task.id}-text" >${task.display}</h3>
         <div class="task-details">
           <span class="due-date">
             <i class="fa-regular fa-calendar"></i> ${formatDateTime(
