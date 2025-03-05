@@ -1,7 +1,7 @@
 import { logMessage } from "./utility.js";
 
 const DB_NAME = "task-manager-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const DB_STORE_NAME = "tasks";
 
 let db;
@@ -22,14 +22,29 @@ export function openDBConnection() {
         logMessage("error", "Database error: ", event.target.error?.message);
       });
 
-      const objectStore = db.createObjectStore(DB_STORE_NAME, {
-        keyPath: "id",
-      });
+      if (!db.objectStoreNames.contains(DB_STORE_NAME)) {
+        const objectStore = db.createObjectStore(DB_STORE_NAME, {
+          keyPath: "id",
+        });
 
-      objectStore.createIndex("id", "id", { unique: true });
-      objectStore.createIndex("display", "display", { unique: false });
-      objectStore.createIndex("position", "position", { unique: false });
-      objectStore.createIndex("status", "status", { unique: false });
+        objectStore.createIndex("id", "id", { unique: true });
+        objectStore.createIndex("display", "display", { unique: false });
+        objectStore.createIndex("position", "position", { unique: false });
+        objectStore.createIndex("status", "status", { unique: false });
+      } else {
+        // Open the existing store and add missing indexes if necessary
+        const objectStore = event.target.transaction.objectStore(DB_STORE_NAME);
+
+        if (!objectStore.indexNames.contains("display")) {
+          objectStore.createIndex("display", "display", { unique: false });
+        }
+        if (!objectStore.indexNames.contains("position")) {
+          objectStore.createIndex("position", "position", { unique: false });
+        }
+        if (!objectStore.indexNames.contains("status")) {
+          objectStore.createIndex("status", "status", { unique: false });
+        }
+      }
     });
 
     request.addEventListener("success", (event) => {
