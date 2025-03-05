@@ -28,8 +28,9 @@ export const registerServiceWorker = async () => {
 
           if (status.state === "granted") {
             await registration.periodicSync.register("check-tasks", {
-              minInterval: 60 * 1000, // 1 minute for testing
+              minInterval: 60 * 60 * 1000, // 1 hour
             });
+
             logMessage("log", "Periodic Sync registered successfully!");
           } else {
             logMessage(

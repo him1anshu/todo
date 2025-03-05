@@ -1,4 +1,4 @@
-const CACHE_NAME = "task-manager-v2";
+const CACHE_NAME = "task-manager-v3";
 const URLS_TO_CACHE = [
   "/",
   "/index.html",
@@ -14,6 +14,11 @@ const URLS_TO_CACHE = [
   "/js/utility.js",
   "/assets/task-manager-logo.png",
   "/og-image.png",
+  "/apple-touch-icon.png",
+  "/favicon-96x96.png",
+  "/favicon.ico",
+  "/favicon.svg",
+  "/manifest.json",
   "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
   "https://fonts.gstatic.com/s/roboto/v47/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",

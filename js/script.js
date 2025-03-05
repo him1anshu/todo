@@ -240,10 +240,15 @@ import {
         });
       }
 
-      // Nofication for tasks
-      // setInterval(async () => {
-      //   await checkDueTasks();
-      // }, 60000);
+      // Nofication for tasks app when the app is open
+      setInterval(async () => {
+        await checkDueTasks();
+      }, 60 * 60 * 1000);
+
+      // Sync PWA theme with system preference
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
     } catch (error) {
       logMessage("error", "Error opening database:", error);
     }
@@ -309,4 +314,14 @@ import {
   );
   document.addEventListener("touchmove", handleTouchMove, { passive: false });
   document.addEventListener("touchend", handleTouchEnd);
+
+  // Watch for system theme changes
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (e) => {
+      document.documentElement.setAttribute(
+        "data-theme",
+        e.matches ? "dark" : "light"
+      );
+    });
 })();
