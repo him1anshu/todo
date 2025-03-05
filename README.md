@@ -225,3 +225,7 @@ Sitemap: https://yourwebsite.com/sitemap.xml
 ### **12. Consider Progressive Web App (PWA) Features**
 
 - If applicable, make your site a **PWA** so users can install it like an app, improving user engagement.
+
+```sh
+gsutil -m setmeta -h "Cache-Control:no-cache, no-store, must-revalidate, max-age=0" gs://tasks.newskills.host/**
+```
